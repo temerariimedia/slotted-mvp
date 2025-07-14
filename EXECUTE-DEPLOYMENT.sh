@@ -68,7 +68,7 @@ if [ $? -eq 0 ]; then
     echo "   vercel env add VITE_OPENAI_API_KEY production"
     echo ""
     echo "   Then paste this key:"
-    echo "   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"
+    echo "   sk-..."
     echo ""
     echo "   Then redeploy:"
     echo "   vercel --prod"

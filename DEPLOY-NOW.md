@@ -23,7 +23,7 @@ vercel --prod
 ```bash
 # Add your OpenAI API key
 vercel env add VITE_OPENAI_API_KEY production
-# Paste: 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
+# Paste: sk-...
 
 # Optional: Add Stripe for payments later
 vercel env add VITE_STRIPE_PUBLISHABLE_KEY production
