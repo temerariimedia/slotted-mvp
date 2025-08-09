@@ -481,7 +481,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${getColorClasses(mvp.color)} rounded-xl flex items-center justify-center text-2xl shadow-lg`}>
+                    <div className={`w-12 h-12 bg-gradient-to-br ${getColorClasses(mvp.color)} rounded-xl flex items-center justify-center text-lg shadow-lg`}>
                       {mvp.icon}
                     </div>
                     <span className="text-sm font-semibold text-gray-500">MVP #{index + 1}</span>
@@ -501,7 +501,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
 
                 <p className="text-gray-600 mb-6 leading-relaxed">{mvp.description}</p>
 
-                <div className="text-2xl lg:text-3xl font-bold text-blue-600 mb-6">{mvp.price}</div>
+                <div className="text-xl lg:text-2xl font-bold text-blue-600 mb-6">{mvp.price}</div>
 
                 <ul className="space-y-3 mb-6">
                   {mvp.features.map((feature, featureIndex) => (
@@ -546,9 +546,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
                 <svg
-                  className="w-10 h-10 text-white"
+                  className="w-8 h-8 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -569,9 +569,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
             </div>
 
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
                 <svg
-                  className="w-10 h-10 text-white"
+                  className="w-8 h-8 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -591,9 +591,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
             </div>
 
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
                 <svg
-                  className="w-10 h-10 text-white"
+                  className="w-8 h-8 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
