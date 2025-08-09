@@ -1,0 +1,22 @@
+name: slotted-mvp
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: temerariimedia/slotted-mvp
+    branch: main
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  build_command: npm ci --production=false && npm run build
+  http_port: 8080
+  routes:
+  - path: /
+  health_check:
+    http_path: /
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: VITE_APP_ENV
+    value: production

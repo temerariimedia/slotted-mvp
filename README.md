@@ -1,15 +1,47 @@
-# Slotted MVP - AI-Powered Omnichannel Marketing Platform
+# Slotted MVP - AI-Powered Marketing Platform
 
-## Overview
-Slotted is an AI-powered omnichannel marketing system built with MCP (Model Context Protocol) as the foundational layer. It enables automated campaign planning, content creation, organization, and delivery across multiple channels.
+## 🚀 Quick Start
 
-## Features Implemented
+### Development
+```bash
+npm install
+npm run dev
+# Open http://localhost:5173
+```
 
-### Phase 1: Foundational Infrastructure ✅
-- ✅ **MCP Context Engine**: Structured onboarding form that outputs `slotted_context.json`
-- ✅ **Company DNA Storage**: Value props, offerings, tone, colors, cadence
-- ✅ **AI Clone + GTM Strategy Builder**: AI persona builder and strategy generator
-- ✅ **React + TypeScript Setup**: Modern frontend with Tailwind CSS
+### Production
+```bash
+npm run build
+npm start
+# Open http://localhost:8080
+```
+
+## 📦 Ready for Digital Ocean Deployment
+
+**See [DEPLOYMENT.md](./DEPLOYMENT.md)** for complete deployment instructions.
+
+**Quick Deploy Steps:**
+1. Push to GitHub repository
+2. Connect to Digital Ocean App Platform  
+3. Build: `npm ci --production=false && npm run build`
+4. Run: `npm start`
+5. ✨ Live preview ready!
+
+## ✅ Production-Ready MVP Features
+
+### Phase 1: Foundation ✅ COMPLETE
+- **Company DNA Extractor** - AI-powered brand analysis ($29-$199)
+- **MCP Context Engine** - Comprehensive onboarding system
+- **Multi-AI Integration** - OpenAI, Anthropic, Google providers
+
+### Phase 2: Planning ✅ COMPLETE  
+- **Marketing Calendar Generator** - 13-week campaign planning ($99-$499)
+- **Channel Configuration** - Advanced Zustand store with persistence
+
+### Phase 3: Content ✅ COMPLETE
+- **Blog Content Engine** - 2000+ word SEO-optimized posts ($49-$299)
+- **Multi-Format Generation** - Scripts, emails, social media content
+- **Brand Voice Consistency** - Uses Company DNA for personalization
 
 ### Core Components
 - **Onboarding Flow**: 7-step comprehensive company setup
