@@ -1,28 +1,30 @@
-const express = require('express');
-const cors = require('cors');
+const express = require('express')
+const cors = require('cors')
 
-const app = express();
-const PORT = 3001;
+const app = express()
+const PORT = 3001
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-}));
-app.use(express.json());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+)
+app.use(express.json())
 
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  res.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'Slotted Test Backend' 
-  });
-});
+    service: 'Slotted Test Backend',
+  })
+})
 
 app.post('/api/campaigns/generate-topics', (req, res) => {
-  const { mcpContext, weeks = 13 } = req.body;
-  
+  const { mcpContext, weeks = 13 } = req.body
+
   if (!mcpContext) {
-    return res.status(400).json({ error: 'MCP context is required' });
+    return res.status(400).json({ error: 'MCP context is required' })
   }
 
   const mockTopics = [
@@ -39,7 +41,7 @@ app.post('/api/campaigns/generate-topics', (req, res) => {
     `Innovation Spotlight: Our Latest Developments`,
     `Partnership Success: Collaborating for Better Results`,
     `Year-End Recap: Achievements and Future Goals`,
-  ].slice(0, weeks);
+  ].slice(0, weeks)
 
   const topics = mockTopics.map((title, index) => ({
     week: index + 1,
@@ -49,43 +51,43 @@ app.post('/api/campaigns/generate-topics', (req, res) => {
     secondaryChannels: mcpContext.marketingGoals?.channels?.secondary || ['Social Media'],
     contentTypes: ['blog', 'social', 'email'],
     estimatedEffort: 6,
-  }));
+  }))
 
-  res.json({ 
-    topics, 
+  res.json({
+    topics,
     weeks,
     generatedAt: new Date().toISOString(),
     mcpVersion: mcpContext.metadata?.version,
-    note: 'Mock campaign topics generated successfully!'
-  });
-});
+    note: 'Mock campaign topics generated successfully!',
+  })
+})
 
 app.post('/api/google/test-connection', (req, res) => {
-  const { credentials } = req.body;
-  
+  const { credentials } = req.body
+
   if (!credentials) {
-    return res.status(400).json({ error: 'Credentials required' });
+    return res.status(400).json({ error: 'Credentials required' })
   }
 
   try {
-    const parsed = JSON.parse(credentials);
-    res.json({ 
-      success: true, 
-      sheets: true, 
+    const parsed = JSON.parse(credentials)
+    res.json({
+      success: true,
+      sheets: true,
       drive: true,
       message: 'Mock connection test successful!',
-      email: parsed.client_email
-    });
+      email: parsed.client_email,
+    })
   } catch (error) {
-    res.status(400).json({ 
-      success: false, 
-      error: 'Invalid credentials format'
-    });
+    res.status(400).json({
+      success: false,
+      error: 'Invalid credentials format',
+    })
   }
-});
+})
 
 app.listen(PORT, () => {
-  console.log(`🚀 Test Backend running on port ${PORT}`);
-  console.log(`📊 Health: http://localhost:${PORT}/health`);
-  console.log('🧪 Ready for testing campaign generation!');
-});
+  console.log(`🚀 Test Backend running on port ${PORT}`)
+  console.log(`📊 Health: http://localhost:${PORT}/health`)
+  console.log('🧪 Ready for testing campaign generation!')
+})

@@ -1,66 +1,66 @@
 // Using built-in fetch (Node 18+)
 
 export interface AIConfig {
-  provider: 'openai' | 'anthropic';
-  model: string;
-  apiKey: string;
-  temperature?: number;
-  maxTokens?: number;
+  provider: 'openai' | 'anthropic'
+  model: string
+  apiKey: string
+  temperature?: number
+  maxTokens?: number
 }
 
 export interface BlogContent {
-  title: string;
-  outline: string[];
-  content: string;
-  wordCount: number;
-  readTime: number;
-  seoKeywords: string[];
-  metaDescription: string;
+  title: string
+  outline: string[]
+  content: string
+  wordCount: number
+  readTime: number
+  seoKeywords: string[]
+  metaDescription: string
 }
 
 export interface VideoScript {
-  title: string;
-  script: string;
-  duration: number;
+  title: string
+  script: string
+  duration: number
   scenes: Array<{
-    timeStart: number;
-    timeEnd: number;
-    description: string;
-    visualCue: string;
-    audio: string;
-  }>;
-  callToAction: string;
+    timeStart: number
+    timeEnd: number
+    description: string
+    visualCue: string
+    audio: string
+  }>
+  callToAction: string
 }
 
 export interface SocialPost {
-  platform: string;
-  post: string;
-  hashtags: string[];
-  timing: string;
-  engagement: string[];
-  visualSuggestions: string[];
+  platform: string
+  post: string
+  hashtags: string[]
+  timing: string
+  engagement: string[]
+  visualSuggestions: string[]
 }
 
 export interface EmailCampaign {
-  subject: string;
-  previewText: string;
-  content: string;
-  plainText: string;
-  callToAction: string;
-  segmentation: string[];
+  subject: string
+  previewText: string
+  content: string
+  plainText: string
+  callToAction: string
+  segmentation: string[]
 }
 
 export class ContentOrchestrator {
-  private aiConfig?: AIConfig;
+  private aiConfig?: AIConfig
 
   constructor(aiConfig?: AIConfig) {
-    this.aiConfig = aiConfig;
+    this.aiConfig = aiConfig
   }
 
   async generateBlog(
-    mcpContext: any, 
-    topic: string, 
-    length: number = 2000,
+    mcpContext: any,
+    topic: string,
+    length = 2000,
     customInstructions?: string
   ): Promise<BlogContent> {
     const prompt = `
@@ -84,19 +84,19 @@ REQUIREMENTS:
 ${customInstructions ? `Additional instructions: ${customInstructions}` : ''}
 
 Return as JSON with title, outline (array), content (full markdown), wordCount, readTime, seoKeywords (array), metaDescription
-`;
+`
 
-    const response = await this.callAI(prompt);
-    return this.parseBlogResponse(response, length);
+    const response = await this.callAI(prompt)
+    return this.parseBlogResponse(response, length)
   }
 
   async generateVideoScript(
-    mcpContext: any, 
-    topic: string, 
+    mcpContext: any,
+    topic: string,
     blogContent?: string
   ): Promise<VideoScript> {
-    const sourceContent = blogContent ? `Based on this blog content:\n${blogContent}\n\n` : '';
-    
+    const sourceContent = blogContent ? `Based on this blog content:\n${blogContent}\n\n` : ''
+
     const prompt = `
 COMPANY CONTEXT:
 ${this.formatMCPContext(mcpContext)}
@@ -114,19 +114,19 @@ REQUIREMENTS:
 - Address audience: ${mcpContext.brandDNA?.targetAudience?.demographics || 'business professionals'}
 
 Return as JSON with title, script (full text), duration (seconds), scenes array with timeStart/timeEnd/description/visualCue/audio, callToAction
-`;
+`
 
-    const response = await this.callAI(prompt);
-    return this.parseVideoResponse(response);
+    const response = await this.callAI(prompt)
+    return this.parseVideoResponse(response)
   }
 
   async generateSocialPosts(
-    mcpContext: any, 
-    topic: string, 
+    mcpContext: any,
+    topic: string,
     platforms: string[] = ['linkedin', 'twitter', 'facebook']
   ): Promise<Record<string, SocialPost>> {
-    const posts: Record<string, SocialPost> = {};
-    
+    const posts: Record<string, SocialPost> = {}
+
     for (const platform of platforms) {
       const prompt = `
 COMPANY CONTEXT:
@@ -143,18 +143,18 @@ BRAND REQUIREMENTS:
 - Target audience: ${mcpContext.brandDNA?.targetAudience?.demographics || 'business professionals'}
 
 Return as JSON with post (optimized text), hashtags (array), timing (best time to post), engagement (suggested engagement tactics), visualSuggestions (array)
-`;
+`
 
-      const response = await this.callAI(prompt);
-      posts[platform] = this.parseSocialResponse(response, platform);
+      const response = await this.callAI(prompt)
+      posts[platform] = this.parseSocialResponse(response, platform)
     }
-    
-    return posts;
+
+    return posts
   }
 
   async generateEmail(
-    mcpContext: any, 
-    topic: string, 
+    mcpContext: any,
+    topic: string,
     type: 'newsletter' | 'promotion' | 'announcement' = 'newsletter'
   ): Promise<EmailCampaign> {
     const prompt = `
@@ -174,29 +174,29 @@ REQUIREMENTS:
 - Target: ${mcpContext.brandDNA?.targetAudience?.demographics || 'business professionals'}
 
 Return as JSON with subject, previewText, content (HTML), plainText, callToAction, segmentation (array of audience segments)
-`;
+`
 
-    const response = await this.callAI(prompt);
-    return this.parseEmailResponse(response);
+    const response = await this.callAI(prompt)
+    return this.parseEmailResponse(response)
   }
 
   async generateVoice(
-    text: string, 
-    voiceId?: string, 
+    text: string,
+    voiceId?: string,
     settings?: any
   ): Promise<{ audioUrl: string; duration: number }> {
     // ElevenLabs integration
-    const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
+    const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY
     if (!elevenLabsApiKey) {
-      throw new Error('ElevenLabs API key not configured');
+      throw new Error('ElevenLabs API key not configured')
     }
 
-    const voice = voiceId || 'pNInz6obpgDQGcFmaJgB'; // Default voice
-    
+    const voice = voiceId || 'pNInz6obpgDQGcFmaJgB' // Default voice
+
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}`, {
       method: 'POST',
       headers: {
-        'Accept': 'audio/mpeg',
+        Accept: 'audio/mpeg',
         'Content-Type': 'application/json',
         'xi-api-key': elevenLabsApiKey,
       },
@@ -208,100 +208,102 @@ Return as JSON with subject, previewText, content (HTML), plainText, callToActio
           similarity_boost: settings?.similarity_boost || 0.5,
         },
       }),
-    });
+    })
 
     if (!response.ok) {
-      throw new Error('Failed to generate voice');
+      throw new Error('Failed to generate voice')
     }
 
     // In production, save to cloud storage and return URL
-    const audioBuffer = await response.arrayBuffer();
-    const audioUrl = `data:audio/mpeg;base64,${Buffer.from(audioBuffer).toString('base64')}`;
-    
+    const audioBuffer = await response.arrayBuffer()
+    const audioUrl = `data:audio/mpeg;base64,${Buffer.from(audioBuffer).toString('base64')}`
+
     return {
       audioUrl,
       duration: Math.ceil(text.length / 15), // Rough estimate: 15 chars per second
-    };
+    }
   }
 
   async generateImages(
-    mcpContext: any, 
-    topic: string, 
+    mcpContext: any,
+    topic: string,
     imageType: 'blog-header' | 'social-post' | 'email-header' | 'thumbnail' = 'blog-header',
     specifications?: any
   ): Promise<{ images: Array<{ url: string; prompt: string; type: string }> }> {
-    const imagePrompt = this.buildImagePrompt(mcpContext, topic, imageType, specifications);
-    
+    const imagePrompt = this.buildImagePrompt(mcpContext, topic, imageType, specifications)
+
     // DALL-E integration
     if (this.aiConfig?.provider === 'openai') {
-      return this.generateWithDALLE(imagePrompt, imageType);
+      return this.generateWithDALLE(imagePrompt, imageType)
     }
-    
+
     // Fallback: return placeholder
     return {
-      images: [{
-        url: `https://via.placeholder.com/800x400/2563eb/ffffff?text=${encodeURIComponent(topic)}`,
-        prompt: imagePrompt,
-        type: imageType,
-      }],
-    };
+      images: [
+        {
+          url: `https://via.placeholder.com/800x400/2563eb/ffffff?text=${encodeURIComponent(topic)}`,
+          prompt: imagePrompt,
+          type: imageType,
+        },
+      ],
+    }
   }
 
   async createVideo(
-    script: string, 
-    voiceSettings?: any, 
+    script: string,
+    voiceSettings?: any,
     videoSettings?: any
   ): Promise<{ videoUrl: string; duration: number }> {
     // This would integrate with video generation services like:
     // - D-ID, Synthesia for AI avatars
     // - Pictory, Lumen5 for automated video creation
     // - OpusClip for video editing
-    
+
     // For MVP, return placeholder
     return {
       videoUrl: 'https://example.com/generated-video.mp4',
       duration: 180, // 3 minutes
-    };
+    }
   }
 
   async generateContentPackage(
-    mcpContext: any, 
-    topic: string, 
+    mcpContext: any,
+    topic: string,
     contentTypes: string[] = ['blog', 'video', 'social', 'email']
   ): Promise<any> {
     const contentPackage: any = {
       topic,
       generatedAt: new Date().toISOString(),
       content: {},
-    };
+    }
 
     // Generate all content types in sequence
     if (contentTypes.includes('blog')) {
-      contentPackage.content.blog = await this.generateBlog(mcpContext, topic);
+      contentPackage.content.blog = await this.generateBlog(mcpContext, topic)
     }
 
     if (contentTypes.includes('video') && contentPackage.content.blog) {
       contentPackage.content.video = await this.generateVideoScript(
-        mcpContext, 
-        topic, 
+        mcpContext,
+        topic,
         contentPackage.content.blog.content
-      );
+      )
     }
 
     if (contentTypes.includes('social')) {
-      const platforms = mcpContext.marketingGoals?.channels?.primary || ['linkedin'];
-      contentPackage.content.social = await this.generateSocialPosts(mcpContext, topic, platforms);
+      const platforms = mcpContext.marketingGoals?.channels?.primary || ['linkedin']
+      contentPackage.content.social = await this.generateSocialPosts(mcpContext, topic, platforms)
     }
 
     if (contentTypes.includes('email')) {
-      contentPackage.content.email = await this.generateEmail(mcpContext, topic);
+      contentPackage.content.email = await this.generateEmail(mcpContext, topic)
     }
 
     if (contentTypes.includes('images')) {
-      contentPackage.content.images = await this.generateImages(mcpContext, topic);
+      contentPackage.content.images = await this.generateImages(mcpContext, topic)
     }
 
-    return contentPackage;
+    return contentPackage
   }
 
   private formatMCPContext(mcpContext: any): string {
@@ -317,36 +319,48 @@ Brand Tone: ${mcpContext.brandDNA?.brandTone?.personality?.join(', ') || ''} - $
 
 Primary Goals: ${mcpContext.marketingGoals?.primaryGoals?.join(', ') || ''}
 Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || ''}
-`;
+`
   }
 
   private getPlatformRequirements(platform: string): string {
     const requirements = {
-      linkedin: '- Professional tone\n- 1300 character limit\n- Include industry insights\n- Use 3-5 relevant hashtags',
-      twitter: '- Conversational tone\n- 280 character limit\n- Include trending hashtags\n- Encourage engagement',
-      facebook: '- Friendly, approachable tone\n- Up to 2000 characters\n- Visual content friendly\n- Community focused',
-      instagram: '- Visual-first approach\n- Up to 2200 characters\n- Story-driven content\n- Use 11-20 hashtags',
-    };
-    
-    return requirements[platform as keyof typeof requirements] || requirements.linkedin;
+      linkedin:
+        '- Professional tone\n- 1300 character limit\n- Include industry insights\n- Use 3-5 relevant hashtags',
+      twitter:
+        '- Conversational tone\n- 280 character limit\n- Include trending hashtags\n- Encourage engagement',
+      facebook:
+        '- Friendly, approachable tone\n- Up to 2000 characters\n- Visual content friendly\n- Community focused',
+      instagram:
+        '- Visual-first approach\n- Up to 2200 characters\n- Story-driven content\n- Use 11-20 hashtags',
+    }
+
+    return requirements[platform as keyof typeof requirements] || requirements.linkedin
   }
 
-  private buildImagePrompt(mcpContext: any, topic: string, imageType: string, specifications?: any): string {
-    const brandColors = mcpContext.brandDNA?.brandColors;
-    const style = specifications?.style || 'modern, professional';
-    
-    return `Create a ${imageType} image for "${topic}". Style: ${style}. Brand colors: ${brandColors?.primary}, ${brandColors?.secondary}. Company: ${mcpContext.company?.name}. Industry: ${mcpContext.company?.industry}.`;
+  private buildImagePrompt(
+    mcpContext: any,
+    topic: string,
+    imageType: string,
+    specifications?: any
+  ): string {
+    const brandColors = mcpContext.brandDNA?.brandColors
+    const style = specifications?.style || 'modern, professional'
+
+    return `Create a ${imageType} image for "${topic}". Style: ${style}. Brand colors: ${brandColors?.primary}, ${brandColors?.secondary}. Company: ${mcpContext.company?.name}. Industry: ${mcpContext.company?.industry}.`
   }
 
-  private async generateWithDALLE(prompt: string, imageType: string): Promise<{ images: Array<{ url: string; prompt: string; type: string }> }> {
+  private async generateWithDALLE(
+    prompt: string,
+    imageType: string
+  ): Promise<{ images: Array<{ url: string; prompt: string; type: string }> }> {
     if (!this.aiConfig?.apiKey) {
-      throw new Error('OpenAI API key required for image generation');
+      throw new Error('OpenAI API key required for image generation')
     }
 
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.aiConfig.apiKey}`,
+        Authorization: `Bearer ${this.aiConfig.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -355,29 +369,29 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
         size: '1024x1024',
         quality: 'standard',
       }),
-    });
+    })
 
-    const data = await response.json() as any;
+    const data = (await response.json()) as any
     return {
       images: data.data.map((img: any) => ({
         url: img.url,
         prompt,
         type: imageType,
       })),
-    };
+    }
   }
 
   private async callAI(prompt: string): Promise<string> {
     if (!this.aiConfig) {
-      throw new Error('AI configuration not provided');
+      throw new Error('AI configuration not provided')
     }
 
     if (this.aiConfig.provider === 'openai') {
-      return this.callOpenAI(prompt);
+      return this.callOpenAI(prompt)
     } else if (this.aiConfig.provider === 'anthropic') {
-      return this.callAnthropic(prompt);
+      return this.callAnthropic(prompt)
     } else {
-      throw new Error(`Unsupported AI provider: ${this.aiConfig.provider}`);
+      throw new Error(`Unsupported AI provider: ${this.aiConfig.provider}`)
     }
   }
 
@@ -385,7 +399,7 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.aiConfig!.apiKey}`,
+        Authorization: `Bearer ${this.aiConfig!.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -394,10 +408,10 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
         temperature: this.aiConfig!.temperature || 0.7,
         max_tokens: this.aiConfig!.maxTokens || 4000,
       }),
-    });
+    })
 
-    const data = await response.json() as any;
-    return data.choices[0].message.content;
+    const data = (await response.json()) as any
+    return data.choices[0].message.content
   }
 
   private async callAnthropic(prompt: string): Promise<string> {
@@ -414,20 +428,20 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
         messages: [{ role: 'user', content: prompt }],
         temperature: this.aiConfig!.temperature || 0.7,
       }),
-    });
+    })
 
-    const data = await response.json() as any;
-    return data.content[0].text;
+    const data = (await response.json()) as any
+    return data.content[0].text
   }
 
   private parseBlogResponse(response: string, targetLength: number): BlogContent {
     try {
-      const parsed = JSON.parse(response);
+      const parsed = JSON.parse(response)
       return {
         ...parsed,
         wordCount: parsed.wordCount || this.countWords(parsed.content || ''),
         readTime: Math.ceil((parsed.wordCount || targetLength) / 200),
-      };
+      }
     } catch (error) {
       return {
         title: 'Generated Blog Post',
@@ -437,13 +451,13 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
         readTime: Math.ceil(this.countWords(response) / 200),
         seoKeywords: [],
         metaDescription: '',
-      };
+      }
     }
   }
 
   private parseVideoResponse(response: string): VideoScript {
     try {
-      return JSON.parse(response);
+      return JSON.parse(response)
     } catch (error) {
       return {
         title: 'Generated Video Script',
@@ -451,14 +465,14 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
         duration: 180,
         scenes: [],
         callToAction: 'Learn more about our services',
-      };
+      }
     }
   }
 
   private parseSocialResponse(response: string, platform: string): SocialPost {
     try {
-      const parsed = JSON.parse(response);
-      return { platform, ...parsed };
+      const parsed = JSON.parse(response)
+      return { platform, ...parsed }
     } catch (error) {
       return {
         platform,
@@ -467,13 +481,13 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
         timing: '9:00 AM',
         engagement: [],
         visualSuggestions: [],
-      };
+      }
     }
   }
 
   private parseEmailResponse(response: string): EmailCampaign {
     try {
-      return JSON.parse(response);
+      return JSON.parse(response)
     } catch (error) {
       return {
         subject: 'Newsletter Update',
@@ -482,11 +496,11 @@ Primary Channels: ${mcpContext.marketingGoals?.channels?.primary?.join(', ') || 
         plainText: response.replace(/<[^>]*>/g, ''),
         callToAction: 'Learn More',
         segmentation: [],
-      };
+      }
     }
   }
 
   private countWords(text: string): number {
-    return text.trim().split(/\s+/).length;
+    return text.trim().split(/\s+/).length
   }
 }

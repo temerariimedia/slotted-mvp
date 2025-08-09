@@ -1,48 +1,48 @@
-import { ChatOpenAI } from '@langchain/openai';
-import { ChatAnthropic } from '@langchain/anthropic';
-import { BaseLanguageModel } from '@langchain/core/language_models/base';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-import { mcpContextEngine } from '../mcp/contextEngine';
+import { ChatAnthropic } from '@langchain/anthropic'
+import type { BaseLanguageModel } from '@langchain/core/language_models/base'
+import { HumanMessage, SystemMessage } from '@langchain/core/messages'
+import { ChatOpenAI } from '@langchain/openai'
+import { mcpContextEngine } from '../mcp/contextEngine'
 
-export type AIProvider = 'openai' | 'anthropic';
-export type AIModel = 'gpt-4o' | 'gpt-4' | 'claude-3-5-sonnet' | 'claude-3-haiku';
+export type AIProvider = 'openai' | 'anthropic'
+export type AIModel = 'gpt-4o' | 'gpt-4' | 'claude-3-5-sonnet' | 'claude-3-haiku'
 
 export interface AIConfig {
-  provider: AIProvider;
-  model: AIModel;
-  apiKey: string;
-  temperature?: number;
-  maxTokens?: number;
+  provider: AIProvider
+  model: AIModel
+  apiKey: string
+  temperature?: number
+  maxTokens?: number
 }
 
 export interface ContentGenerationRequest {
-  type: 'blog' | 'script' | 'social' | 'email' | 'gtm-strategy' | 'campaign-topics';
-  topic?: string;
-  length?: number;
-  tone?: string;
-  customInstructions?: string;
+  type: 'blog' | 'script' | 'social' | 'email' | 'gtm-strategy' | 'campaign-topics'
+  topic?: string
+  length?: number
+  tone?: string
+  customInstructions?: string
 }
 
 export interface ContentGenerationResponse {
-  content: string;
+  content: string
   metadata: {
-    wordCount: number;
-    estimatedReadTime: number;
-    generatedAt: string;
-    model: string;
-  };
+    wordCount: number
+    estimatedReadTime: number
+    generatedAt: string
+    model: string
+  }
 }
 
 export class AIOrchestrator {
-  private models: Map<string, BaseLanguageModel> = new Map();
-  private defaultProvider: AIProvider = 'openai';
-  private defaultModel: AIModel = 'gpt-4o';
+  private models: Map<string, BaseLanguageModel> = new Map()
+  private defaultProvider: AIProvider = 'openai'
+  private defaultModel: AIModel = 'gpt-4o'
 
   public configureProvider(config: AIConfig): void {
-    const key = `${config.provider}-${config.model}`;
-    
-    let model: BaseLanguageModel;
-    
+    const key = `${config.provider}-${config.model}`
+
+    let model: BaseLanguageModel
+
     switch (config.provider) {
       case 'openai':
         model = new ChatOpenAI({
@@ -50,42 +50,42 @@ export class AIOrchestrator {
           openAIApiKey: config.apiKey,
           temperature: config.temperature || 0.7,
           maxTokens: config.maxTokens || 4000,
-        });
-        break;
-        
+        })
+        break
+
       case 'anthropic':
         model = new ChatAnthropic({
           modelName: config.model,
           anthropicApiKey: config.apiKey,
           temperature: config.temperature || 0.7,
           maxTokens: config.maxTokens || 4000,
-        });
-        break;
-        
+        })
+        break
+
       default:
-        throw new Error(`Unsupported AI provider: ${config.provider}`);
+        throw new Error(`Unsupported AI provider: ${config.provider}`)
     }
-    
-    this.models.set(key, model);
-    console.log(`AI provider configured: ${key}`);
+
+    this.models.set(key, model)
+    console.log(`AI provider configured: ${key}`)
   }
 
   public setDefaultProvider(provider: AIProvider, model: AIModel): void {
-    this.defaultProvider = provider;
-    this.defaultModel = model;
+    this.defaultProvider = provider
+    this.defaultModel = model
   }
 
   private getModel(provider?: AIProvider, model?: AIModel): BaseLanguageModel {
-    const targetProvider = provider || this.defaultProvider;
-    const targetModel = model || this.defaultModel;
-    const key = `${targetProvider}-${targetModel}`;
-    
-    const modelInstance = this.models.get(key);
+    const targetProvider = provider || this.defaultProvider
+    const targetModel = model || this.defaultModel
+    const key = `${targetProvider}-${targetModel}`
+
+    const modelInstance = this.models.get(key)
     if (!modelInstance) {
-      throw new Error(`AI model not configured: ${key}. Please configure the provider first.`);
+      throw new Error(`AI model not configured: ${key}. Please configure the provider first.`)
     }
-    
-    return modelInstance;
+
+    return modelInstance
   }
 
   public async generateContent(
@@ -94,20 +94,17 @@ export class AIOrchestrator {
     model?: AIModel
   ): Promise<ContentGenerationResponse> {
     try {
-      const llm = this.getModel(provider, model);
-      const mcpContext = mcpContextEngine.getMCPPromptContext();
-      
-      const systemPrompt = this.buildSystemPrompt(request.type, mcpContext);
-      const userPrompt = this.buildUserPrompt(request);
-      
-      const messages = [
-        new SystemMessage(systemPrompt),
-        new HumanMessage(userPrompt)
-      ];
-      
-      const response = await llm.invoke(messages);
-      const content = response.content.toString();
-      
+      const llm = this.getModel(provider, model)
+      const mcpContext = mcpContextEngine.getMCPPromptContext()
+
+      const systemPrompt = this.buildSystemPrompt(request.type, mcpContext)
+      const userPrompt = this.buildUserPrompt(request)
+
+      const messages = [new SystemMessage(systemPrompt), new HumanMessage(userPrompt)]
+
+      const response = await llm.invoke(messages)
+      const content = response.content.toString()
+
       return {
         content,
         metadata: {
@@ -116,10 +113,12 @@ export class AIOrchestrator {
           generatedAt: new Date().toISOString(),
           model: `${provider || this.defaultProvider}-${model || this.defaultModel}`,
         },
-      };
+      }
     } catch (error) {
-      console.error('Content generation failed:', error);
-      throw new Error(`AI content generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Content generation failed:', error)
+      throw new Error(
+        `AI content generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
@@ -136,7 +135,7 @@ IMPORTANT GUIDELINES:
 - Address the target audience's specific pain points
 - Follow the established content cadence and channel preferences
 - Ensure all content aligns with the GTM strategy and market positioning
-`;
+`
 
     const typeSpecificPrompts = {
       blog: `Create a comprehensive blog post that educates and engages the target audience. Structure should include:
@@ -180,99 +179,113 @@ IMPORTANT GUIDELINES:
 - Seasonal/timely opportunities
 - Content variety and format suggestions
 - Engagement potential assessment`,
-    };
+    }
 
-    return basePrompt + '\n\n' + (typeSpecificPrompts[contentType as keyof typeof typeSpecificPrompts] || '');
+    return (
+      basePrompt +
+      '\n\n' +
+      (typeSpecificPrompts[contentType as keyof typeof typeSpecificPrompts] || '')
+    )
   }
 
   private buildUserPrompt(request: ContentGenerationRequest): string {
-    let prompt = `Create ${request.type} content`;
-    
+    let prompt = `Create ${request.type} content`
+
     if (request.topic) {
-      prompt += ` about: ${request.topic}`;
+      prompt += ` about: ${request.topic}`
     }
-    
+
     if (request.length) {
-      prompt += `\nTarget length: ${request.length} words`;
+      prompt += `\nTarget length: ${request.length} words`
     }
-    
+
     if (request.tone) {
-      prompt += `\nTone: ${request.tone}`;
+      prompt += `\nTone: ${request.tone}`
     }
-    
+
     if (request.customInstructions) {
-      prompt += `\nAdditional instructions: ${request.customInstructions}`;
+      prompt += `\nAdditional instructions: ${request.customInstructions}`
     }
-    
-    prompt += '\n\nPlease ensure the content is optimized for the target audience and aligns with the brand guidelines provided in the context.';
-    
-    return prompt;
+
+    prompt +=
+      '\n\nPlease ensure the content is optimized for the target audience and aligns with the brand guidelines provided in the context.'
+
+    return prompt
   }
 
-  public async generateCampaignTopics(weeks: number = 13): Promise<string[]> {
+  public async generateCampaignTopics(weeks = 13): Promise<string[]> {
     const response = await this.generateContent({
       type: 'campaign-topics',
       customInstructions: `Generate exactly ${weeks} campaign topics that span a quarter. Each topic should be distinct, engaging, and build upon the previous ones to create a cohesive narrative arc.`,
-    });
-    
+    })
+
     const topics = response.content
       .split('\n')
-      .filter(line => line.trim() && (line.includes('.') || line.includes('-')))
-      .map(line => line.replace(/^\d+\.?\s*[-•]?\s*/, '').trim())
-      .slice(0, weeks);
-    
-    return topics.length >= weeks ? topics : this.generateFallbackTopics(weeks);
+      .filter((line) => line.trim() && (line.includes('.') || line.includes('-')))
+      .map((line) => line.replace(/^\d+\.?\s*[-•]?\s*/, '').trim())
+      .slice(0, weeks)
+
+    return topics.length >= weeks ? topics : this.generateFallbackTopics(weeks)
   }
 
   private generateFallbackTopics(weeks: number): string[] {
-    return Array.from({ length: weeks }, (_, i) => `Campaign Topic ${i + 1}`);
+    return Array.from({ length: weeks }, (_, i) => `Campaign Topic ${i + 1}`)
   }
 
-  public async generateBlogFromTopic(topic: string, length: number = 2000): Promise<ContentGenerationResponse> {
+  public async generateBlogFromTopic(
+    topic: string,
+    length = 2000
+  ): Promise<ContentGenerationResponse> {
     return this.generateContent({
       type: 'blog',
       topic,
       length,
-    });
+    })
   }
 
   public async generateVideoScript(blogContent: string): Promise<ContentGenerationResponse> {
     return this.generateContent({
       type: 'script',
       customInstructions: `Convert this blog post into an engaging video script:\n\n${blogContent}`,
-    });
+    })
   }
 
-  public async generateSocialPosts(topic: string, platforms: string[]): Promise<Record<string, string>> {
-    const posts: Record<string, string> = {};
-    
+  public async generateSocialPosts(
+    topic: string,
+    platforms: string[]
+  ): Promise<Record<string, string>> {
+    const posts: Record<string, string> = {}
+
     for (const platform of platforms) {
       const response = await this.generateContent({
         type: 'social',
         topic,
         customInstructions: `Create a ${platform} post optimized for that platform's best practices and audience behavior.`,
-      });
-      posts[platform] = response.content;
+      })
+      posts[platform] = response.content
     }
-    
-    return posts;
+
+    return posts
   }
 
-  public async generateEmailCampaign(topic: string, type: 'newsletter' | 'promotion' | 'announcement' = 'newsletter'): Promise<ContentGenerationResponse> {
+  public async generateEmailCampaign(
+    topic: string,
+    type: 'newsletter' | 'promotion' | 'announcement' = 'newsletter'
+  ): Promise<ContentGenerationResponse> {
     return this.generateContent({
       type: 'email',
       topic,
       customInstructions: `Create a ${type} email that drives engagement and conversions.`,
-    });
+    })
   }
 
   public getConfiguredProviders(): string[] {
-    return Array.from(this.models.keys());
+    return Array.from(this.models.keys())
   }
 
   public isConfigured(): boolean {
-    return this.models.size > 0;
+    return this.models.size > 0
   }
 }
 
-export const aiOrchestrator = new AIOrchestrator();
+export const aiOrchestrator = new AIOrchestrator()

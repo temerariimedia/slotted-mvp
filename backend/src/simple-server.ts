@@ -1,35 +1,37 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import cors from 'cors'
+import dotenv from 'dotenv'
+import express from 'express'
 
-dotenv.config();
+dotenv.config()
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+const app = express()
+const PORT = process.env.PORT || 3001
 
 // Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true,
-}));
-app.use(express.json({ limit: '50mb' }));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+  })
+)
+app.use(express.json({ limit: '50mb' }))
 
 // Simple test routes
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  res.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'Slotted Backend API (Simple Mode)' 
-  });
-});
+    service: 'Slotted Backend API (Simple Mode)',
+  })
+})
 
 // Mock campaign generation for testing
 app.post('/api/campaigns/generate-topics', async (req, res) => {
   try {
-    const { mcpContext, weeks = 13 } = req.body;
-    
+    const { mcpContext, weeks = 13 } = req.body
+
     if (!mcpContext) {
-      return res.status(400).json({ error: 'MCP context is required' });
+      return res.status(400).json({ error: 'MCP context is required' })
     }
 
     // Generate mock topics based on company context
@@ -47,7 +49,7 @@ app.post('/api/campaigns/generate-topics', async (req, res) => {
       `Innovation Spotlight: Our Latest Developments`,
       `Partnership Success: Collaborating for Better Results`,
       `Year-End Recap: Achievements and Future Goals`,
-    ].slice(0, weeks);
+    ].slice(0, weeks)
 
     const topics = mockTopics.map((title, index) => ({
       week: index + 1,
@@ -57,61 +59,61 @@ app.post('/api/campaigns/generate-topics', async (req, res) => {
       secondaryChannels: mcpContext.marketingGoals?.channels?.secondary || ['Social Media'],
       contentTypes: ['blog', 'social', 'email'],
       estimatedEffort: 6,
-    }));
+    }))
 
-    res.json({ 
-      topics, 
+    res.json({
+      topics,
       weeks,
       generatedAt: new Date().toISOString(),
       mcpVersion: mcpContext.metadata?.version,
-      note: 'Mock data - configure AI providers for real generation'
-    });
+      note: 'Mock data - configure AI providers for real generation',
+    })
   } catch (error) {
-    console.error('Failed to generate campaign topics:', error);
-    res.status(500).json({ 
-      error: error instanceof Error ? error.message : 'Failed to generate topics'
-    });
+    console.error('Failed to generate campaign topics:', error)
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to generate topics',
+    })
   }
-});
+})
 
 // Mock Google Workspace test
 app.post('/api/google/test-connection', async (req, res) => {
   try {
-    const { credentials } = req.body;
-    
+    const { credentials } = req.body
+
     if (!credentials) {
-      return res.status(400).json({ error: 'Credentials required' });
+      return res.status(400).json({ error: 'Credentials required' })
     }
 
     // Simple validation
-    const parsed = JSON.parse(credentials);
+    const parsed = JSON.parse(credentials)
     if (!parsed.client_email || !parsed.private_key) {
-      return res.status(400).json({ error: 'Invalid credentials format' });
+      return res.status(400).json({ error: 'Invalid credentials format' })
     }
 
-    res.json({ 
-      success: true, 
-      sheets: true, 
+    res.json({
+      success: true,
+      sheets: true,
       drive: true,
       message: 'Mock connection test successful - real Google APIs not implemented yet',
-      email: parsed.client_email
-    });
+      email: parsed.client_email,
+    })
   } catch (error) {
-    console.error('Google Workspace test failed:', error);
-    res.status(400).json({ 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Connection test failed'
-    });
+    console.error('Google Workspace test failed:', error)
+    res.status(400).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Connection test failed',
+    })
   }
-});
+})
 
 // Mock content generation
 app.post('/api/content/generate-blog', async (req, res) => {
   try {
-    const { mcpContext, topic, length = 2000 } = req.body;
-    
+    const { mcpContext, topic, length = 2000 } = req.body
+
     if (!mcpContext || !topic) {
-      return res.status(400).json({ error: 'MCP context and topic are required' });
+      return res.status(400).json({ error: 'MCP context and topic are required' })
     }
 
     const mockBlog = {
@@ -123,7 +125,7 @@ app.post('/api/content/generate-blog', async (req, res) => {
         'Real-World Applications',
         'Benefits and Results',
         'Getting Started',
-        'Conclusion and Next Steps'
+        'Conclusion and Next Steps',
       ],
       content: `# ${topic} - A Deep Dive for ${mcpContext.company.name}
 
@@ -162,23 +164,23 @@ Ready to learn more about how ${mcpContext.company.name} can help with ${topic.t
       wordCount: length,
       readTime: Math.ceil(length / 200),
       seoKeywords: [topic.toLowerCase(), mcpContext.company.industry],
-      metaDescription: `Learn how ${mcpContext.company.name} approaches ${topic.toLowerCase()} in the ${mcpContext.company.industry} industry.`
-    };
+      metaDescription: `Learn how ${mcpContext.company.name} approaches ${topic.toLowerCase()} in the ${mcpContext.company.industry} industry.`,
+    }
 
-    res.json(mockBlog);
+    res.json(mockBlog)
   } catch (error) {
-    console.error('Failed to generate blog:', error);
-    res.status(500).json({ 
-      error: error instanceof Error ? error.message : 'Failed to generate blog'
-    });
+    console.error('Failed to generate blog:', error)
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to generate blog',
+    })
   }
-});
+})
 
 app.listen(PORT, () => {
-  console.log(`🚀 Slotted Backend (Simple Mode) running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 Frontend CORS: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
-  console.log('');
-  console.log('🧪 TESTING MODE: Mock data will be returned');
-  console.log('💡 Configure AI providers in .env for real content generation');
-});
+  console.log(`🚀 Slotted Backend (Simple Mode) running on port ${PORT}`)
+  console.log(`📊 Health check: http://localhost:${PORT}/health`)
+  console.log(`🔗 Frontend CORS: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`)
+  console.log('')
+  console.log('🧪 TESTING MODE: Mock data will be returned')
+  console.log('💡 Configure AI providers in .env for real content generation')
+})

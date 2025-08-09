@@ -1,5 +1,5 @@
-import { chromium, type Browser, type Page } from 'playwright'
 import * as cheerio from 'cheerio'
+import { type Browser, type Page, chromium } from 'playwright'
 import { z } from 'zod'
 
 // Website analysis result schema
@@ -11,10 +11,12 @@ export const WebsiteAnalysisSchema = z.object({
     headings: z.array(z.string()),
     paragraphs: z.array(z.string()),
     links: z.array(z.string()),
-    images: z.array(z.object({
-      src: z.string(),
-      alt: z.string().optional(),
-    })),
+    images: z.array(
+      z.object({
+        src: z.string(),
+        alt: z.string().optional(),
+      })
+    ),
   }),
   metadata: z.object({
     metaDescription: z.string().optional(),
@@ -97,14 +99,15 @@ export class AdvancedWebsiteAnalyzer {
       // Set viewport and user agent
       await page.setViewportSize({ width: 1920, height: 1080 })
       await page.setExtraHTTPHeaders({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
       })
 
       // Navigate to the website
       console.log(`🔍 Analyzing website: ${url}`)
-      await page.goto(url, { 
+      await page.goto(url, {
         waitUntil: 'networkidle',
-        timeout: 30000 
+        timeout: 30000,
       })
 
       // Extract page content
@@ -113,14 +116,22 @@ export class AdvancedWebsiteAnalyzer {
 
       // Extract metadata
       const title = await page.title()
-      const metaDescription = await page.locator('meta[name="description"]').getAttribute('content') || ''
-      const ogTitle = await page.locator('meta[property="og:title"]').getAttribute('content') || ''
-      const ogDescription = await page.locator('meta[property="og:description"]').getAttribute('content') || ''
-      const ogImage = await page.locator('meta[property="og:image"]').getAttribute('content') || ''
-      
+      const metaDescription =
+        (await page.locator('meta[name="description"]').getAttribute('content')) || ''
+      const ogTitle =
+        (await page.locator('meta[property="og:title"]').getAttribute('content')) || ''
+      const ogDescription =
+        (await page.locator('meta[property="og:description"]').getAttribute('content')) || ''
+      const ogImage =
+        (await page.locator('meta[property="og:image"]').getAttribute('content')) || ''
+
       // Extract keywords from meta tags
-      const keywordsContent = await page.locator('meta[name="keywords"]').getAttribute('content') || ''
-      const keywords = keywordsContent.split(',').map(k => k.trim()).filter(k => k.length > 0)
+      const keywordsContent =
+        (await page.locator('meta[name="keywords"]').getAttribute('content')) || ''
+      const keywords = keywordsContent
+        .split(',')
+        .map((k) => k.trim())
+        .filter((k) => k.length > 0)
 
       // Extract content elements
       const headings: string[] = []
@@ -153,9 +164,9 @@ export class AdvancedWebsiteAnalyzer {
 
       // Take screenshot
       const screenshotPath = `/tmp/screenshot-${Date.now()}.png`
-      await page.screenshot({ 
-        path: screenshotPath, 
-        fullPage: true 
+      await page.screenshot({
+        path: screenshotPath,
+        fullPage: true,
       })
 
       const loadTime = Date.now() - startTime
@@ -188,11 +199,12 @@ export class AdvancedWebsiteAnalyzer {
 
       await page.close()
       return WebsiteAnalysisSchema.parse(analysis)
-
     } catch (error) {
       await page.close()
       console.error('❌ Website analysis failed:', error)
-      throw new Error(`Failed to analyze website ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to analyze website ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
@@ -205,12 +217,12 @@ export class AdvancedWebsiteAnalyzer {
       const colorScheme = await page.evaluate(() => {
         const colors: string[] = []
         const elements = document.querySelectorAll('*')
-        
-        elements.forEach(element => {
+
+        elements.forEach((element) => {
           const styles = window.getComputedStyle(element)
           const bgColor = styles.backgroundColor
           const color = styles.color
-          
+
           if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
             colors.push(bgColor)
           }
@@ -218,7 +230,7 @@ export class AdvancedWebsiteAnalyzer {
             colors.push(color)
           }
         })
-        
+
         // Convert to hex and deduplicate
         const uniqueColors = [...new Set(colors)]
         return uniqueColors.slice(0, 10) // Limit to 10 most common colors
@@ -228,15 +240,15 @@ export class AdvancedWebsiteAnalyzer {
       const fonts = await page.evaluate(() => {
         const fontFamilies: string[] = []
         const elements = document.querySelectorAll('*')
-        
-        elements.forEach(element => {
+
+        elements.forEach((element) => {
           const styles = window.getComputedStyle(element)
           const fontFamily = styles.fontFamily
           if (fontFamily) {
             fontFamilies.push(fontFamily)
           }
         })
-        
+
         return [...new Set(fontFamilies)].slice(0, 5)
       })
 
@@ -246,7 +258,7 @@ export class AdvancedWebsiteAnalyzer {
         const bodyStyles = window.getComputedStyle(body)
         const display = bodyStyles.display
         const gridTemplateColumns = bodyStyles.gridTemplateColumns
-        
+
         if (gridTemplateColumns && gridTemplateColumns !== 'none') {
           return 'grid-based layout'
         } else if (display === 'flex') {
@@ -277,12 +289,12 @@ export class AdvancedWebsiteAnalyzer {
   public async extractBrandVisualAnalysis(analysis: WebsiteAnalysis): Promise<BrandVisualAnalysis> {
     // This would typically use Claude Computer Use or GPT-4V to analyze the screenshot
     // For now, we'll extract what we can from the structured data
-    
+
     const colors = analysis.visualElements.colorScheme
     const fonts = analysis.visualElements.fonts
 
     // Convert RGB/RGBA colors to hex (simplified)
-    const hexColors = colors.map(color => {
+    const hexColors = colors.map((color) => {
       if (color.startsWith('#')) return color
       // For now, return default colors - in production, convert RGB to hex
       return '#2563eb'
@@ -291,7 +303,7 @@ export class AdvancedWebsiteAnalyzer {
     // Extract primary brand colors (this would be AI-enhanced in production)
     const brandColors = {
       primary: hexColors[0] || '#2563eb',
-      secondary: hexColors[1] || '#3b82f6', 
+      secondary: hexColors[1] || '#3b82f6',
       accent: hexColors[2] || '#10b981',
       palette: hexColors.slice(0, 8),
     }
@@ -332,21 +344,21 @@ export class AdvancedWebsiteAnalyzer {
   public extractContentForBrandAnalysis(analysis: WebsiteAnalysis): string {
     const { headings, paragraphs } = analysis.content
     const { metaDescription } = analysis.metadata
-    
+
     let content = ''
-    
+
     if (metaDescription) {
       content += `Meta Description: ${metaDescription}\n\n`
     }
-    
+
     if (headings.length > 0) {
       content += `Headings:\n${headings.slice(0, 10).join('\n')}\n\n`
     }
-    
+
     if (paragraphs.length > 0) {
       content += `Content:\n${paragraphs.slice(0, 5).join('\n\n')}`
     }
-    
+
     return content
   }
 

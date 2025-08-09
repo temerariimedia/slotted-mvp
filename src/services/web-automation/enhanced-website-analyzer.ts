@@ -1,5 +1,5 @@
-import { chromium, type Browser, type Page, type BrowserContext } from 'playwright'
 import * as cheerio from 'cheerio'
+import { type Browser, type BrowserContext, type Page, chromium } from 'playwright'
 import { z } from 'zod'
 
 // Enhanced website analysis schemas
@@ -8,35 +8,47 @@ export const EnhancedWebsiteAnalysisSchema = z.object({
   title: z.string(),
   description: z.string(),
   content: z.object({
-    headings: z.array(z.object({
-      level: z.number(),
-      text: z.string(),
-      hierarchy: z.string(),
-    })),
-    paragraphs: z.array(z.object({
-      text: z.string(),
-      wordCount: z.number(),
-      sentiment: z.enum(['positive', 'neutral', 'negative']).optional(),
-    })),
-    links: z.array(z.object({
-      href: z.string(),
-      text: z.string(),
-      type: z.enum(['internal', 'external', 'email', 'phone']),
-    })),
-    images: z.array(z.object({
-      src: z.string(),
-      alt: z.string().optional(),
-      title: z.string().optional(),
-      dimensions: z.object({
-        width: z.number(),
-        height: z.number(),
-      }).optional(),
-    })),
-    forms: z.array(z.object({
-      action: z.string().optional(),
-      method: z.string().optional(),
-      fields: z.array(z.string()),
-    })),
+    headings: z.array(
+      z.object({
+        level: z.number(),
+        text: z.string(),
+        hierarchy: z.string(),
+      })
+    ),
+    paragraphs: z.array(
+      z.object({
+        text: z.string(),
+        wordCount: z.number(),
+        sentiment: z.enum(['positive', 'neutral', 'negative']).optional(),
+      })
+    ),
+    links: z.array(
+      z.object({
+        href: z.string(),
+        text: z.string(),
+        type: z.enum(['internal', 'external', 'email', 'phone']),
+      })
+    ),
+    images: z.array(
+      z.object({
+        src: z.string(),
+        alt: z.string().optional(),
+        title: z.string().optional(),
+        dimensions: z
+          .object({
+            width: z.number(),
+            height: z.number(),
+          })
+          .optional(),
+      })
+    ),
+    forms: z.array(
+      z.object({
+        action: z.string().optional(),
+        method: z.string().optional(),
+        fields: z.array(z.string()),
+      })
+    ),
   }),
   metadata: z.object({
     metaDescription: z.string().optional(),
@@ -59,24 +71,30 @@ export const EnhancedWebsiteAnalysisSchema = z.object({
   brandElements: z.object({
     colors: z.object({
       dominant: z.array(z.string()),
-      palette: z.array(z.object({
-        color: z.string(),
-        usage: z.string(),
-        frequency: z.number(),
-      })),
+      palette: z.array(
+        z.object({
+          color: z.string(),
+          usage: z.string(),
+          frequency: z.number(),
+        })
+      ),
     }),
     typography: z.object({
-      fonts: z.array(z.object({
-        family: z.string(),
-        usage: z.enum(['heading', 'body', 'accent']),
-        weight: z.string().optional(),
-      })),
-      headingStyles: z.array(z.object({
-        level: z.string(),
-        fontSize: z.string(),
-        fontWeight: z.string(),
-        color: z.string(),
-      })),
+      fonts: z.array(
+        z.object({
+          family: z.string(),
+          usage: z.enum(['heading', 'body', 'accent']),
+          weight: z.string().optional(),
+        })
+      ),
+      headingStyles: z.array(
+        z.object({
+          level: z.string(),
+          fontSize: z.string(),
+          fontWeight: z.string(),
+          color: z.string(),
+        })
+      ),
     }),
     layout: z.object({
       structure: z.enum(['single-column', 'multi-column', 'grid', 'asymmetric']),
@@ -84,10 +102,12 @@ export const EnhancedWebsiteAnalysisSchema = z.object({
         type: z.enum(['horizontal', 'vertical', 'hamburger', 'mega']),
         items: z.array(z.string()),
       }),
-      sections: z.array(z.object({
-        type: z.string(),
-        content: z.string(),
-      })),
+      sections: z.array(
+        z.object({
+          type: z.string(),
+          content: z.string(),
+        })
+      ),
     }),
   }),
   technicalDetails: z.object({
@@ -116,20 +136,24 @@ export const EnhancedWebsiteAnalysisSchema = z.object({
     businessModel: z.array(z.string()),
     targetAudience: z.array(z.string()),
     valuePropositions: z.array(z.string()),
-    callsToAction: z.array(z.object({
-      text: z.string(),
-      type: z.enum(['primary', 'secondary', 'tertiary']),
-      location: z.string(),
-    })),
+    callsToAction: z.array(
+      z.object({
+        text: z.string(),
+        type: z.enum(['primary', 'secondary', 'tertiary']),
+        location: z.string(),
+      })
+    ),
   }),
-  screenshots: z.array(z.object({
-    type: z.enum(['full-page', 'above-fold', 'mobile', 'tablet']),
-    path: z.string(),
-    dimensions: z.object({
-      width: z.number(),
-      height: z.number(),
-    }),
-  })),
+  screenshots: z.array(
+    z.object({
+      type: z.enum(['full-page', 'above-fold', 'mobile', 'tablet']),
+      path: z.string(),
+      dimensions: z.object({
+        width: z.number(),
+        height: z.number(),
+      }),
+    })
+  ),
   analyzedAt: z.string(),
   analysisVersion: z.string(),
 })
@@ -160,7 +184,8 @@ export class EnhancedWebsiteAnalyzer {
 
       this.context = await this.browser.newContext({
         viewport: { width: 1920, height: 1080 },
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+        userAgent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
         deviceScaleFactor: 1,
         hasTouch: false,
         javaScriptEnabled: true,
@@ -188,9 +213,9 @@ export class EnhancedWebsiteAnalyzer {
       console.log(`🔍 Starting comprehensive analysis of: ${url}`)
 
       // Navigate with performance monitoring
-      const response = await page.goto(url, { 
+      const response = await page.goto(url, {
         waitUntil: 'networkidle',
-        timeout: 30000 
+        timeout: 30000,
       })
 
       if (!response || !response.ok()) {
@@ -215,7 +240,7 @@ export class EnhancedWebsiteAnalyzer {
         brandElements,
         technicalDetails,
         businessInsights,
-        screenshots
+        screenshots,
       ] = await Promise.all([
         this.extractBasicInfo(page, $),
         this.extractContent(page, $),
@@ -223,7 +248,7 @@ export class EnhancedWebsiteAnalyzer {
         this.extractBrandElements(page, $),
         this.extractTechnicalDetails(page, $, performanceMetrics),
         this.extractBusinessInsights(page, $),
-        this.takeScreenshots(page)
+        this.takeScreenshots(page),
       ])
 
       const analysis: EnhancedWebsiteAnalysis = {
@@ -242,11 +267,12 @@ export class EnhancedWebsiteAnalyzer {
 
       await page.close()
       return EnhancedWebsiteAnalysisSchema.parse(analysis)
-
     } catch (error) {
       await page.close()
       console.error('❌ Website analysis failed:', error)
-      throw new Error(`Failed to analyze website ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to analyze website ${url}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
@@ -256,14 +282,17 @@ export class EnhancedWebsiteAnalyzer {
   private async extractPerformanceMetrics(page: Page, startTime: number): Promise<any> {
     try {
       const performanceMetrics = await page.evaluate(() => {
-        const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+        const navigation = performance.getEntriesByType(
+          'navigation'
+        )[0] as PerformanceNavigationTiming
         const paint = performance.getEntriesByType('paint')
-        
+
         return {
           domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
           loadComplete: navigation.loadEventEnd - navigation.fetchStart,
-          firstContentfulPaint: paint.find(p => p.name === 'first-contentful-paint')?.startTime,
-          largestContentfulPaint: paint.find(p => p.name === 'largest-contentful-paint')?.startTime,
+          firstContentfulPaint: paint.find((p) => p.name === 'first-contentful-paint')?.startTime,
+          largestContentfulPaint: paint.find((p) => p.name === 'largest-contentful-paint')
+            ?.startTime,
         }
       })
 
@@ -287,7 +316,7 @@ export class EnhancedWebsiteAnalyzer {
   private async extractBasicInfo(page: Page, $: cheerio.CheerioAPI): Promise<any> {
     const title = await page.title()
     const metaDescription = $('meta[name="description"]').attr('content') || ''
-    
+
     return {
       title,
       description: metaDescription,
@@ -302,7 +331,7 @@ export class EnhancedWebsiteAnalyzer {
     const headings: any[] = []
     $('h1, h2, h3, h4, h5, h6').each((_, element) => {
       const text = $(element).text().trim()
-      const level = parseInt(element.tagName.substring(1))
+      const level = Number.parseInt(element.tagName.substring(1))
       if (text) {
         headings.push({
           level,
@@ -331,7 +360,7 @@ export class EnhancedWebsiteAnalyzer {
       const text = $(element).text().trim()
       if (href) {
         let type: 'internal' | 'external' | 'email' | 'phone' = 'external'
-        
+
         if (href.startsWith('/') || href.includes(page.url())) {
           type = 'internal'
         } else if (href.startsWith('mailto:')) {
@@ -361,11 +390,13 @@ export class EnhancedWebsiteAnalyzer {
       const action = $(element).attr('action')
       const method = $(element).attr('method')
       const fields: string[] = []
-      
-      $(element).find('input, textarea, select').each((_, field) => {
-        const name = $(field).attr('name') || $(field).attr('id')
-        if (name) fields.push(name)
-      })
+
+      $(element)
+        .find('input, textarea, select')
+        .each((_, field) => {
+          const name = $(field).attr('name') || $(field).attr('id')
+          if (name) fields.push(name)
+        })
 
       forms.push({ action, method, fields })
     })
@@ -384,8 +415,12 @@ export class EnhancedWebsiteAnalyzer {
    */
   private async extractMetadata(page: Page, $: cheerio.CheerioAPI): Promise<any> {
     const metaDescription = $('meta[name="description"]').attr('content')
-    const metaKeywords = $('meta[name="keywords"]').attr('content')?.split(',').map(k => k.trim()) || []
-    
+    const metaKeywords =
+      $('meta[name="keywords"]')
+        .attr('content')
+        ?.split(',')
+        .map((k) => k.trim()) || []
+
     const openGraph = {
       title: $('meta[property="og:title"]').attr('content'),
       description: $('meta[property="og:description"]').attr('content'),
@@ -424,11 +459,11 @@ export class EnhancedWebsiteAnalyzer {
         const headingStyles: any[] = []
 
         // Extract colors from computed styles
-        document.querySelectorAll('*').forEach(element => {
+        document.querySelectorAll('*').forEach((element) => {
           const styles = window.getComputedStyle(element)
           const bgColor = styles.backgroundColor
           const color = styles.color
-          
+
           if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
             colors.push(bgColor)
           }
@@ -438,7 +473,7 @@ export class EnhancedWebsiteAnalyzer {
         })
 
         // Extract fonts
-        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span').forEach(element => {
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span').forEach((element) => {
           const styles = window.getComputedStyle(element)
           const fontFamily = styles.fontFamily
           if (fontFamily) {
@@ -451,7 +486,7 @@ export class EnhancedWebsiteAnalyzer {
         })
 
         // Extract heading styles
-        document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(element => {
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((element) => {
           const styles = window.getComputedStyle(element)
           headingStyles.push({
             level: element.tagName.toLowerCase(),
@@ -466,12 +501,14 @@ export class EnhancedWebsiteAnalyzer {
 
       // Process and deduplicate
       const uniqueColors = [...new Set(brandData.colors)].slice(0, 20)
-      const uniqueFonts = brandData.fonts.reduce((acc: any[], font) => {
-        if (!acc.find(f => f.family === font.family)) {
-          acc.push(font)
-        }
-        return acc
-      }, []).slice(0, 10)
+      const uniqueFonts = brandData.fonts
+        .reduce((acc: any[], font) => {
+          if (!acc.find((f) => f.family === font.family)) {
+            acc.push(font)
+          }
+          return acc
+        }, [])
+        .slice(0, 10)
 
       // Analyze navigation
       const navigation = {
@@ -489,7 +526,7 @@ export class EnhancedWebsiteAnalyzer {
       return {
         colors: {
           dominant: uniqueColors.slice(0, 5),
-          palette: uniqueColors.map(color => ({
+          palette: uniqueColors.map((color) => ({
             color,
             usage: 'unknown',
             frequency: 1,
@@ -510,7 +547,11 @@ export class EnhancedWebsiteAnalyzer {
       return {
         colors: { dominant: [], palette: [] },
         typography: { fonts: [], headingStyles: [] },
-        layout: { structure: 'single-column', navigation: { type: 'horizontal', items: [] }, sections: [] },
+        layout: {
+          structure: 'single-column',
+          navigation: { type: 'horizontal', items: [] },
+          sections: [],
+        },
       }
     }
   }
@@ -518,17 +559,21 @@ export class EnhancedWebsiteAnalyzer {
   /**
    * Extract technical SEO and accessibility details
    */
-  private async extractTechnicalDetails(page: Page, $: cheerio.CheerioAPI, performanceMetrics: any): Promise<any> {
+  private async extractTechnicalDetails(
+    page: Page,
+    $: cheerio.CheerioAPI,
+    performanceMetrics: any
+  ): Promise<any> {
     const hasStructuredData = $('script[type="application/ld+json"]').length > 0
     const hasRobotsMeta = $('meta[name="robots"]').length > 0
     const hasCanonicalUrl = $('link[rel="canonical"]').length > 0
-    
+
     // Check heading structure
     const headingLevels = [] as number[]
     $('h1, h2, h3, h4, h5, h6').each((_, element) => {
-      headingLevels.push(parseInt(element.tagName.substring(1)))
+      headingLevels.push(Number.parseInt(element.tagName.substring(1)))
     })
-    
+
     const headingStructure = headingLevels.length > 0 && headingLevels[0] === 1 ? 'good' : 'fair'
     const imageAltTags = $('img[alt]').length
 
@@ -554,18 +599,19 @@ export class EnhancedWebsiteAnalyzer {
    */
   private async extractBusinessInsights(page: Page, $: cheerio.CheerioAPI): Promise<any> {
     const callsToAction: any[] = []
-    
+
     // Find CTAs
     $('button, .btn, .cta, a').each((_, element) => {
       const text = $(element).text().trim()
-      if (text && (
-        text.toLowerCase().includes('get started') ||
-        text.toLowerCase().includes('sign up') ||
-        text.toLowerCase().includes('learn more') ||
-        text.toLowerCase().includes('contact') ||
-        text.toLowerCase().includes('buy') ||
-        text.toLowerCase().includes('try')
-      )) {
+      if (
+        text &&
+        (text.toLowerCase().includes('get started') ||
+          text.toLowerCase().includes('sign up') ||
+          text.toLowerCase().includes('learn more') ||
+          text.toLowerCase().includes('contact') ||
+          text.toLowerCase().includes('buy') ||
+          text.toLowerCase().includes('try'))
+      ) {
         callsToAction.push({
           text,
           type: 'primary',
@@ -594,11 +640,11 @@ export class EnhancedWebsiteAnalyzer {
     try {
       // Full page screenshot
       const fullPagePath = `/tmp/screenshot-full-${timestamp}.png`
-      await page.screenshot({ 
-        path: fullPagePath, 
-        fullPage: true 
+      await page.screenshot({
+        path: fullPagePath,
+        fullPage: true,
       })
-      
+
       screenshots.push({
         type: 'full-page',
         path: fullPagePath,
@@ -607,17 +653,16 @@ export class EnhancedWebsiteAnalyzer {
 
       // Above the fold screenshot
       const aboveFoldPath = `/tmp/screenshot-fold-${timestamp}.png`
-      await page.screenshot({ 
+      await page.screenshot({
         path: aboveFoldPath,
-        clip: { x: 0, y: 0, width: 1920, height: 1080 }
+        clip: { x: 0, y: 0, width: 1920, height: 1080 },
       })
-      
+
       screenshots.push({
         type: 'above-fold',
         path: aboveFoldPath,
         dimensions: { width: 1920, height: 1080 },
       })
-
     } catch (error) {
       console.error('Screenshot capture failed:', error)
     }
@@ -630,28 +675,28 @@ export class EnhancedWebsiteAnalyzer {
    */
   public extractContentForAI(analysis: EnhancedWebsiteAnalysis): string {
     let content = `Website Analysis for ${analysis.url}\n\n`
-    
+
     content += `Title: ${analysis.title}\n`
     content += `Description: ${analysis.description}\n\n`
-    
+
     if (analysis.content.headings.length > 0) {
       content += `Headings:\n`
-      analysis.content.headings.slice(0, 10).forEach(heading => {
+      analysis.content.headings.slice(0, 10).forEach((heading) => {
         content += `${heading.hierarchy.toUpperCase()}: ${heading.text}\n`
       })
       content += '\n'
     }
-    
+
     if (analysis.content.paragraphs.length > 0) {
       content += `Content Excerpts:\n`
-      analysis.content.paragraphs.slice(0, 5).forEach(para => {
+      analysis.content.paragraphs.slice(0, 5).forEach((para) => {
         content += `${para.text}\n\n`
       })
     }
 
     if (analysis.businessInsights.callsToAction.length > 0) {
       content += `Calls to Action:\n`
-      analysis.businessInsights.callsToAction.forEach(cta => {
+      analysis.businessInsights.callsToAction.forEach((cta) => {
         content += `- ${cta.text}\n`
       })
       content += '\n'

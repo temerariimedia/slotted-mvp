@@ -51,11 +51,13 @@ export const MarketingCalendarSchema = z.object({
     saturday: z.array(z.string()),
   }),
   kpiTracking: z.object({
-    metrics: z.array(z.object({
-      name: z.string(),
-      target: z.number(),
-      measurement: z.string(),
-    })),
+    metrics: z.array(
+      z.object({
+        name: z.string(),
+        target: z.number(),
+        measurement: z.string(),
+      })
+    ),
     reportingSchedule: z.string(),
   }),
   generatedAt: z.string(),
@@ -85,23 +87,29 @@ export class AdvancedCampaignGenerator {
     const weeks = options.weeks || 13
     const startDate = options.startDate || new Date()
     const endDate = new Date(startDate)
-    endDate.setDate(startDate.getDate() + (weeks * 7))
+    endDate.setDate(startDate.getDate() + weeks * 7)
 
-    console.log(`📅 Generating ${weeks}-week marketing calendar for ${options.companyDNA.company.name}`)
+    console.log(
+      `📅 Generating ${weeks}-week marketing calendar for ${options.companyDNA.company.name}`
+    )
 
     try {
       // Generate campaign topics using AI
-      const campaigns = await this.generateCampaignTopics(options.companyDNA, weeks, options.focusAreas)
-      
+      const campaigns = await this.generateCampaignTopics(
+        options.companyDNA,
+        weeks,
+        options.focusAreas
+      )
+
       // Create strategic framework
       const strategy = await this.generateStrategy(options.companyDNA, campaigns, options.budget)
-      
+
       // Create channel strategy
       const channelStrategy = this.createChannelStrategy(options.companyDNA, campaigns)
-      
+
       // Generate content calendar (Sunday-Saturday posting pattern)
       const contentCalendar = this.generateContentCalendar(campaigns, options.companyDNA)
-      
+
       // Set up KPI tracking
       const kpiTracking = this.setupKPITracking(options.companyDNA, campaigns)
 
@@ -124,7 +132,9 @@ export class AdvancedCampaignGenerator {
       return MarketingCalendarSchema.parse(calendar)
     } catch (error) {
       console.error('❌ Marketing calendar generation failed:', error)
-      throw new Error(`Failed to generate marketing calendar: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to generate marketing calendar: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
@@ -132,12 +142,12 @@ export class AdvancedCampaignGenerator {
    * Generate strategic campaign topics using AI
    */
   private async generateCampaignTopics(
-    companyDNA: CompanyDNA, 
-    weeks: number, 
+    companyDNA: CompanyDNA,
+    weeks: number,
     focusAreas?: string[]
   ): Promise<CampaignTopic[]> {
     const prompt = this.buildCampaignPrompt(companyDNA, weeks, focusAreas)
-    
+
     const response = await this.aiOrchestrator.generateContent({
       type: 'campaign-topics',
       customInstructions: prompt,
@@ -149,7 +159,11 @@ export class AdvancedCampaignGenerator {
   /**
    * Build comprehensive campaign generation prompt
    */
-  private buildCampaignPrompt(companyDNA: CompanyDNA, weeks: number, focusAreas?: string[]): string {
+  private buildCampaignPrompt(
+    companyDNA: CompanyDNA,
+    weeks: number,
+    focusAreas?: string[]
+  ): string {
     const { company, brandDNA, marketingInsights } = companyDNA
 
     return `
@@ -205,7 +219,11 @@ Ensure each campaign builds logically on previous ones and addresses different a
   /**
    * Parse AI response into structured campaign topics
    */
-  private parseCampaignTopics(response: string, weeks: number, companyDNA: CompanyDNA): CampaignTopic[] {
+  private parseCampaignTopics(
+    response: string,
+    weeks: number,
+    companyDNA: CompanyDNA
+  ): CampaignTopic[] {
     try {
       const parsed = JSON.parse(response)
       if (Array.isArray(parsed) && parsed.length >= weeks) {
@@ -227,7 +245,7 @@ Ensure each campaign builds logically on previous ones and addresses different a
    */
   private generateFallbackTopics(weeks: number, companyDNA: CompanyDNA): CampaignTopic[] {
     const { company, brandDNA, marketingInsights } = companyDNA
-    
+
     const baseTopics = [
       {
         title: `Introducing ${company.name}: Our Mission and Vision`,
@@ -298,7 +316,7 @@ Ensure each campaign builds logically on previous ones and addresses different a
 
     return Array.from({ length: weeks }, (_, index) => {
       const baseTopic = baseTopics[index] || baseTopics[index % baseTopics.length]
-      
+
       return {
         week: index + 1,
         title: baseTopic.title,
@@ -307,8 +325,19 @@ Ensure each campaign builds logically on previous ones and addresses different a
         primaryChannel: marketingInsights.recommendedChannels[0] || 'Blog',
         secondaryChannels: marketingInsights.recommendedChannels.slice(1, 3) || ['Social Media'],
         contentTypes: ['blog', 'social'] as const,
-        keywords: [`${company.name}`, company.industry.toLowerCase(), brandDNA.valuePropositions[0]?.toLowerCase().split(' ')[0] || 'business'].filter(Boolean),
-        callToAction: index % 4 === 0 ? 'Contact Us' : index % 4 === 1 ? 'Learn More' : index % 4 === 2 ? 'Get Started' : 'Download Now',
+        keywords: [
+          `${company.name}`,
+          company.industry.toLowerCase(),
+          brandDNA.valuePropositions[0]?.toLowerCase().split(' ')[0] || 'business',
+        ].filter(Boolean),
+        callToAction:
+          index % 4 === 0
+            ? 'Contact Us'
+            : index % 4 === 1
+              ? 'Learn More'
+              : index % 4 === 2
+                ? 'Get Started'
+                : 'Download Now',
         estimatedEffort: Math.floor(Math.random() * 3) + 5, // 5-7 effort
         businessGoal: baseTopic.businessGoal,
         seasonalRelevance: index % 6 === 0 ? 'Consider current season and holidays' : undefined,
@@ -319,9 +348,13 @@ Ensure each campaign builds logically on previous ones and addresses different a
   /**
    * Generate overall marketing strategy
    */
-  private async generateStrategy(companyDNA: CompanyDNA, campaigns: CampaignTopic[], budget?: string): Promise<any> {
-    const themes = [...new Set(campaigns.map(c => c.theme))]
-    const goals = [...new Set(campaigns.map(c => c.businessGoal))]
+  private async generateStrategy(
+    companyDNA: CompanyDNA,
+    campaigns: CampaignTopic[],
+    budget?: string
+  ): Promise<any> {
+    const themes = [...new Set(campaigns.map((c) => c.theme))]
+    const goals = [...new Set(campaigns.map((c) => c.businessGoal))]
 
     return {
       overallTheme: `Strategic ${companyDNA.company.industry} Marketing: ${companyDNA.marketingInsights.marketPosition}`,
@@ -345,9 +378,12 @@ Ensure each campaign builds logically on previous ones and addresses different a
     const channelUsage = new Map<string, number>()
 
     // Count channel usage across campaigns
-    campaigns.forEach(campaign => {
-      channelUsage.set(campaign.primaryChannel, (channelUsage.get(campaign.primaryChannel) || 0) + 2)
-      campaign.secondaryChannels.forEach(channel => {
+    campaigns.forEach((campaign) => {
+      channelUsage.set(
+        campaign.primaryChannel,
+        (channelUsage.get(campaign.primaryChannel) || 0) + 2
+      )
+      campaign.secondaryChannels.forEach((channel) => {
         channelUsage.set(channel, (channelUsage.get(channel) || 0) + 1)
       })
     })
@@ -380,9 +416,9 @@ Ensure each campaign builds logically on previous ones and addresses different a
    * Set up KPI tracking framework
    */
   private setupKPITracking(companyDNA: CompanyDNA, campaigns: CampaignTopic[]): any {
-    const businessGoals = [...new Set(campaigns.map(c => c.businessGoal))]
+    const businessGoals = [...new Set(campaigns.map((c) => c.businessGoal))]
 
-    const metrics = businessGoals.map(goal => {
+    const metrics = businessGoals.map((goal) => {
       switch (goal) {
         case 'awareness':
           return { name: 'Brand Awareness', target: 10000, measurement: 'Monthly Reach' }
@@ -412,19 +448,19 @@ Ensure each campaign builds logically on previous ones and addresses different a
     const sheets = {
       'Campaign Overview': [
         ['Week', 'Campaign Title', 'Theme', 'Primary Channel', 'Business Goal', 'Effort', 'Status'],
-        ...calendar.campaigns.map(campaign => [
+        ...calendar.campaigns.map((campaign) => [
           campaign.week,
           campaign.title,
           campaign.theme,
           campaign.primaryChannel,
           campaign.businessGoal,
           campaign.estimatedEffort,
-          'Planned'
-        ])
+          'Planned',
+        ]),
       ],
       'Content Calendar': [
         ['Week', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        ...calendar.campaigns.map(campaign => [
+        ...calendar.campaigns.map((campaign) => [
           `Week ${campaign.week}`,
           campaign.contentTypes.includes('blog') ? campaign.title : '',
           campaign.contentTypes.includes('social') ? 'Social Push' : '',
@@ -432,18 +468,18 @@ Ensure each campaign builds logically on previous ones and addresses different a
           'Case Study/Customer Focus',
           'Product/Team Updates',
           'Community Content',
-          'Week Planning'
-        ])
+          'Week Planning',
+        ]),
       ],
       'KPI Tracking': [
         ['Metric', 'Target', 'Current', 'Progress %', 'Notes'],
-        ...calendar.kpiTracking.metrics.map(metric => [
+        ...calendar.kpiTracking.metrics.map((metric) => [
           metric.name,
           metric.target,
           0, // Current value to be filled in
           0, // Progress percentage
-          'Track weekly'
-        ])
+          'Track weekly',
+        ]),
       ],
       'Channel Strategy': [
         ['Channel', 'Type', 'Usage Count', 'Content Types'],
@@ -451,9 +487,9 @@ Ensure each campaign builds logically on previous ones and addresses different a
           channel,
           calendar.channelStrategy.primary.includes(channel) ? 'Primary' : 'Secondary',
           count,
-          'Blog, Social, Email'
-        ])
-      ]
+          'Blog, Social, Email',
+        ]),
+      ],
     }
 
     return sheets

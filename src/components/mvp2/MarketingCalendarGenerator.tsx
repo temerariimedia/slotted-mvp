@@ -1,7 +1,12 @@
-import React, { useState } from 'react'
-import { campaignGenerator, type MarketingCalendar, type CampaignTopic } from '@/services/campaigns/campaign-generator'
-import { modernAIOrchestrator, type CompanyDNA } from '@/services/ai/modern-ai-orchestrator'
+import { type CompanyDNA, modernAIOrchestrator } from '@/services/ai/modern-ai-orchestrator'
+import {
+  type CampaignTopic,
+  type MarketingCalendar,
+  campaignGenerator,
+} from '@/services/campaigns/campaign-generator'
 import { paymentStateManager } from '@/services/payments/stripe-integration'
+import type React from 'react'
+import { useState } from 'react'
 
 interface MarketingCalendarGeneratorProps {
   companyDNA?: CompanyDNA
@@ -12,7 +17,7 @@ interface MarketingCalendarGeneratorProps {
 export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProps> = ({
   companyDNA,
   userEmail,
-  onCalendarGenerated
+  onCalendarGenerated,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [calendar, setCalendar] = useState<MarketingCalendar | null>(null)
@@ -22,7 +27,7 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
     weeks: 13,
     startDate: new Date().toISOString().split('T')[0],
     focusAreas: [] as string[],
-    budget: ''
+    budget: '',
   })
 
   const handleGenerateCalendar = async () => {
@@ -42,7 +47,9 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
 
     try {
       // Initialize campaign generator with AI orchestrator
-      const generator = new (await import('@/services/campaigns/campaign-generator')).AdvancedCampaignGenerator(modernAIOrchestrator)
+      const generator = new (
+        await import('@/services/campaigns/campaign-generator')
+      ).AdvancedCampaignGenerator(modernAIOrchestrator)
 
       setCurrentStep('Generating strategic campaign topics...')
       setProgress(25)
@@ -51,8 +58,9 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
         companyDNA,
         weeks: generationOptions.weeks,
         startDate: new Date(generationOptions.startDate),
-        focusAreas: generationOptions.focusAreas.length > 0 ? generationOptions.focusAreas : undefined,
-        budget: generationOptions.budget || undefined
+        focusAreas:
+          generationOptions.focusAreas.length > 0 ? generationOptions.focusAreas : undefined,
+        budget: generationOptions.budget || undefined,
       })
 
       setCurrentStep('Building content strategy...')
@@ -85,12 +93,13 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
   const handleExportToGoogleSheets = () => {
     if (!calendar) return
 
-    const generator = new (require('@/services/campaigns/campaign-generator')).AdvancedCampaignGenerator(null)
+    const generator =
+      new (require('@/services/campaigns/campaign-generator').AdvancedCampaignGenerator)(null)
     const sheetsData = generator.exportToGoogleSheets(calendar)
-    
+
     // Create downloadable CSV files for each sheet
     Object.entries(sheetsData).forEach(([sheetName, data]) => {
-      const csv = (data as any[][]).map(row => row.join(',')).join('\n')
+      const csv = (data as any[][]).map((row) => row.join(',')).join('\n')
       const blob = new Blob([csv], { type: 'text/csv' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -106,11 +115,11 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
   }
 
   const handleFocusAreaToggle = (area: string) => {
-    setGenerationOptions(prev => ({
+    setGenerationOptions((prev) => ({
       ...prev,
       focusAreas: prev.focusAreas.includes(area)
-        ? prev.focusAreas.filter(a => a !== area)
-        : [...prev.focusAreas, area]
+        ? prev.focusAreas.filter((a) => a !== area)
+        : [...prev.focusAreas, area],
     }))
   }
 
@@ -122,16 +131,14 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
     'Thought Leadership',
     'Community Building',
     'SEO & Content Marketing',
-    'Social Media Growth'
+    'Social Media Growth',
   ]
 
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            🗓️ Marketing Calendar Generator
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">🗓️ Marketing Calendar Generator</h2>
           <p className="text-xl text-gray-600">
             Generate a comprehensive 13-week marketing strategy based on your company DNA
           </p>
@@ -150,11 +157,15 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
               </div>
               <div>
                 <span className="font-medium text-blue-800">Target Audience:</span>
-                <span className="ml-2 text-blue-700">{companyDNA.brandDNA.targetAudience.demographics}</span>
+                <span className="ml-2 text-blue-700">
+                  {companyDNA.brandDNA.targetAudience.demographics}
+                </span>
               </div>
               <div>
                 <span className="font-medium text-blue-800">Market Position:</span>
-                <span className="ml-2 text-blue-700">{companyDNA.marketingInsights.marketPosition}</span>
+                <span className="ml-2 text-blue-700">
+                  {companyDNA.marketingInsights.marketPosition}
+                </span>
               </div>
             </div>
           </div>
@@ -163,7 +174,7 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
         {/* Generation Options */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Generation Settings</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Basic Options */}
             <div className="space-y-4">
@@ -173,7 +184,12 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
                 </label>
                 <select
                   value={generationOptions.weeks}
-                  onChange={(e) => setGenerationOptions(prev => ({ ...prev, weeks: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setGenerationOptions((prev) => ({
+                      ...prev,
+                      weeks: Number.parseInt(e.target.value),
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   disabled={isGenerating}
                 >
@@ -184,13 +200,13 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Date
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                 <input
                   type="date"
                   value={generationOptions.startDate}
-                  onChange={(e) => setGenerationOptions(prev => ({ ...prev, startDate: e.target.value }))}
+                  onChange={(e) =>
+                    setGenerationOptions((prev) => ({ ...prev, startDate: e.target.value }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   disabled={isGenerating}
                 />
@@ -203,7 +219,9 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
                 <input
                   type="text"
                   value={generationOptions.budget}
-                  onChange={(e) => setGenerationOptions(prev => ({ ...prev, budget: e.target.value }))}
+                  onChange={(e) =>
+                    setGenerationOptions((prev) => ({ ...prev, budget: e.target.value }))
+                  }
                   placeholder="e.g., $5,000/month, $60,000/year"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   disabled={isGenerating}
@@ -217,7 +235,7 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
                 Focus Areas (select multiple)
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {focusAreaOptions.map(area => (
+                {focusAreaOptions.map((area) => (
                   <label key={area} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -243,8 +261,8 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
                 <span className="text-sm text-gray-500">{progress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -294,20 +312,22 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-2">Period</h4>
                 <p className="text-sm text-gray-600">
-                  {new Date(calendar.period.startDate).toLocaleDateString()} - 
+                  {new Date(calendar.period.startDate).toLocaleDateString()} -
                   {new Date(calendar.period.endDate).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-600">{calendar.period.weeks} weeks</p>
               </div>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-2">Strategy</h4>
                 <p className="text-sm text-gray-600">{calendar.strategy.overallTheme}</p>
               </div>
-              
+
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-900 mb-2">Campaigns</h4>
-                <p className="text-sm text-gray-600">{calendar.campaigns.length} strategic campaigns</p>
+                <p className="text-sm text-gray-600">
+                  {calendar.campaigns.length} strategic campaigns
+                </p>
               </div>
             </div>
 
@@ -341,7 +361,7 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
                     </div>
                   </div>
                 ))}
-                
+
                 {calendar.campaigns.length > 6 && (
                   <div className="text-center py-4">
                     <span className="text-gray-500">
@@ -359,30 +379,39 @@ export const MarketingCalendarGenerator: React.FC<MarketingCalendarGeneratorProp
                 <div>
                   <h5 className="font-medium text-gray-900 mb-2">Primary Channels</h5>
                   <div className="space-y-1">
-                    {calendar.channelStrategy.primary.map(channel => (
-                      <span key={channel} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">
+                    {calendar.channelStrategy.primary.map((channel) => (
+                      <span
+                        key={channel}
+                        className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1"
+                      >
                         {channel}
                       </span>
                     ))}
                   </div>
                 </div>
-                
+
                 <div>
                   <h5 className="font-medium text-gray-900 mb-2">Secondary Channels</h5>
                   <div className="space-y-1">
-                    {calendar.channelStrategy.secondary.map(channel => (
-                      <span key={channel} className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mr-1">
+                    {calendar.channelStrategy.secondary.map((channel) => (
+                      <span
+                        key={channel}
+                        className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mr-1"
+                      >
                         {channel}
                       </span>
                     ))}
                   </div>
                 </div>
-                
+
                 <div>
                   <h5 className="font-medium text-gray-900 mb-2">Experimental</h5>
                   <div className="space-y-1">
-                    {calendar.channelStrategy.experimental.map(channel => (
-                      <span key={channel} className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded mr-1">
+                    {calendar.channelStrategy.experimental.map((channel) => (
+                      <span
+                        key={channel}
+                        className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded mr-1"
+                      >
                         {channel}
                       </span>
                     ))}

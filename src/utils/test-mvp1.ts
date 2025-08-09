@@ -3,9 +3,13 @@
  * This file helps validate the complete functionality
  */
 
-import { modernAIOrchestrator, type AIConfig, type CompanyDNA } from '../services/ai/modern-ai-orchestrator'
-import { enhancedWebsiteAnalyzer } from '../services/web-automation/enhanced-website-analyzer'
+import {
+  type AIConfig,
+  type CompanyDNA,
+  modernAIOrchestrator,
+} from '../services/ai/modern-ai-orchestrator'
 import { modernMCPEngine } from '../services/mcp/modern-mcp-server'
+import { enhancedWebsiteAnalyzer } from '../services/web-automation/enhanced-website-analyzer'
 
 // Test configuration
 const TEST_CONFIG: AIConfig = {
@@ -52,7 +56,7 @@ export class MVP1Tester {
    */
   public async runTests(): Promise<void> {
     console.log('🧪 Starting MVP #1 comprehensive tests...')
-    
+
     // Validate environment
     if (!this.validateEnvironment()) {
       console.error('❌ Environment validation failed')
@@ -80,14 +84,14 @@ export class MVP1Tester {
    */
   private validateEnvironment(): boolean {
     console.log('🔍 Validating test environment...')
-    
+
     const requiredEnvVars = [
       'VITE_ANTHROPIC_API_KEY',
       // Add other required env vars as needed
     ]
 
-    const missing = requiredEnvVars.filter(key => !process.env[key])
-    
+    const missing = requiredEnvVars.filter((key) => !process.env[key])
+
     if (missing.length > 0) {
       console.error(`❌ Missing environment variables: ${missing.join(', ')}`)
       return false
@@ -102,10 +106,10 @@ export class MVP1Tester {
    */
   private async testAIConfiguration(): Promise<void> {
     console.log('🤖 Testing AI orchestrator configuration...')
-    
+
     try {
       modernAIOrchestrator.configureProvider(TEST_CONFIG)
-      
+
       if (!modernAIOrchestrator.isConfigured()) {
         throw new Error('AI orchestrator not configured properly')
       }
@@ -123,14 +127,14 @@ export class MVP1Tester {
    */
   private async testWebsiteAnalyzer(): Promise<void> {
     console.log('🌐 Testing enhanced website analyzer...')
-    
+
     try {
       await enhancedWebsiteAnalyzer.initialize()
-      
+
       // Test with a simple, reliable website
       const testUrl = 'https://example.com'
       const analysis = await enhancedWebsiteAnalyzer.analyzeWebsite(testUrl)
-      
+
       if (!analysis.title || !analysis.url) {
         throw new Error('Website analysis missing required fields')
       }
@@ -138,7 +142,7 @@ export class MVP1Tester {
       console.log(`✅ Website analyzer test passed - analyzed ${testUrl}`)
       console.log(`   Title: ${analysis.title}`)
       console.log(`   Performance: ${analysis.technicalDetails.performance.loadTime}ms`)
-      
+
       await enhancedWebsiteAnalyzer.cleanup()
     } catch (error) {
       console.error('❌ Website analyzer test failed:', error)
@@ -152,7 +156,7 @@ export class MVP1Tester {
    */
   private async testMCPEngine(): Promise<void> {
     console.log('🔧 Testing MCP engine...')
-    
+
     try {
       // Test context loading (should return null for new installation)
       const existingContext = await modernMCPEngine.loadContext()
@@ -161,7 +165,7 @@ export class MVP1Tester {
       // Test tools and resources
       const tools = modernMCPEngine.getTools()
       const resources = modernMCPEngine.getResources()
-      
+
       console.log(`✅ MCP engine test passed`)
       console.log(`   Available tools: ${tools.length}`)
       console.log(`   Available resources: ${resources.length}`)
@@ -176,13 +180,14 @@ export class MVP1Tester {
    */
   private async testCompanyDNAExtraction(): Promise<void> {
     console.log('🧬 Testing end-to-end company DNA extraction...')
-    
-    for (const company of TEST_COMPANIES.slice(0, 1)) { // Test with first company only
+
+    for (const company of TEST_COMPANIES.slice(0, 1)) {
+      // Test with first company only
       const startTime = Date.now()
-      
+
       try {
         console.log(`   Extracting DNA for: ${company.name}`)
-        
+
         const dna = await modernAIOrchestrator.extractCompanyDNA({
           companyName: company.name,
           website: company.website,
@@ -191,7 +196,7 @@ export class MVP1Tester {
         })
 
         const duration = Date.now() - startTime
-        
+
         // Validate DNA structure
         if (!dna.company.name || !dna.brandDNA || !dna.metadata) {
           throw new Error('Invalid DNA structure returned')
@@ -209,10 +214,9 @@ export class MVP1Tester {
         console.log(`   Duration: ${duration}ms`)
         console.log(`   Confidence: ${Math.round(dna.metadata.confidenceScore * 100)}%`)
         console.log(`   Value props: ${dna.brandDNA.valuePropositions.length}`)
-        
       } catch (error) {
         const duration = Date.now() - startTime
-        
+
         this.testResults.push({
           company: company.name,
           success: false,
@@ -232,19 +236,21 @@ export class MVP1Tester {
   private generateTestReport(): void {
     console.log('\n📊 MVP #1 Test Report')
     console.log('================================')
-    
+
     const totalTests = this.testResults.length
-    const successfulTests = this.testResults.filter(r => r.success).length
+    const successfulTests = this.testResults.filter((r) => r.success).length
     const failedTests = totalTests - successfulTests
-    
+
     console.log(`Total tests: ${totalTests}`)
     console.log(`Successful: ${successfulTests}`)
     console.log(`Failed: ${failedTests}`)
-    console.log(`Success rate: ${totalTests > 0 ? Math.round((successfulTests / totalTests) * 100) : 0}%`)
-    
+    console.log(
+      `Success rate: ${totalTests > 0 ? Math.round((successfulTests / totalTests) * 100) : 0}%`
+    )
+
     if (this.testResults.length > 0) {
       console.log('\nDetailed Results:')
-      this.testResults.forEach(result => {
+      this.testResults.forEach((result) => {
         const status = result.success ? '✅' : '❌'
         console.log(`${status} ${result.company}`)
         console.log(`   Duration: ${result.duration}ms`)
@@ -272,19 +278,26 @@ export class MVP1Tester {
    * Export test results as JSON
    */
   public exportResults(): string {
-    return JSON.stringify({
-      timestamp: new Date().toISOString(),
-      testSuite: 'MVP #1 - Company DNA Extractor',
-      version: '2.0.0',
-      results: this.testResults,
-      summary: {
-        total: this.testResults.length,
-        successful: this.testResults.filter(r => r.success).length,
-        failed: this.testResults.filter(r => !r.success).length,
-        averageDuration: this.testResults.reduce((sum, r) => sum + r.duration, 0) / this.testResults.length,
-        averageConfidence: this.testResults.filter(r => r.success).reduce((sum, r) => sum + r.confidence, 0) / this.testResults.filter(r => r.success).length,
+    return JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        testSuite: 'MVP #1 - Company DNA Extractor',
+        version: '2.0.0',
+        results: this.testResults,
+        summary: {
+          total: this.testResults.length,
+          successful: this.testResults.filter((r) => r.success).length,
+          failed: this.testResults.filter((r) => !r.success).length,
+          averageDuration:
+            this.testResults.reduce((sum, r) => sum + r.duration, 0) / this.testResults.length,
+          averageConfidence:
+            this.testResults.filter((r) => r.success).reduce((sum, r) => sum + r.confidence, 0) /
+            this.testResults.filter((r) => r.success).length,
+        },
       },
-    }, null, 2)
+      null,
+      2
+    )
   }
 }
 
@@ -297,5 +310,5 @@ export const testMVP1 = async () => {
 
 // For browser console testing
 if (typeof window !== 'undefined') {
-  (window as any).testMVP1 = testMVP1
+  ;(window as any).testMVP1 = testMVP1
 }

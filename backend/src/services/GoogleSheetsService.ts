@@ -1,33 +1,33 @@
-import { google } from 'googleapis';
+import { google } from 'googleapis'
 
 export interface CampaignCalendarRow {
-  week: number;
-  date: string;
-  topic: string;
-  primaryChannel: string;
-  secondaryChannels: string;
-  contentTypes: string;
-  status: string;
-  driveFolder: string;
-  notes: string;
+  week: number
+  date: string
+  topic: string
+  primaryChannel: string
+  secondaryChannels: string
+  contentTypes: string
+  status: string
+  driveFolder: string
+  notes: string
 }
 
 export class GoogleSheetsService {
-  private sheets: any;
-  private auth: any;
+  private sheets: any
+  private auth: any
 
   constructor(credentials: any) {
     this.auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-    
-    this.sheets = google.sheets({ version: 'v4', auth: this.auth });
+    })
+
+    this.sheets = google.sheets({ version: 'v4', auth: this.auth })
   }
 
   async createCampaignCalendar(
-    companyName: string, 
-    campaigns: string[], 
+    companyName: string,
+    campaigns: string[],
     mcpContext: any
   ): Promise<{ id: string; url: string }> {
     // Create new spreadsheet
@@ -53,25 +53,25 @@ export class GoogleSheetsService {
           },
         ],
       },
-    });
+    })
 
-    const spreadsheetId = spreadsheet.data.spreadsheetId!;
-    
+    const spreadsheetId = spreadsheet.data.spreadsheetId!
+
     // Setup main calendar sheet
-    await this.setupCalendarSheet(spreadsheetId, campaigns, mcpContext);
-    
+    await this.setupCalendarSheet(spreadsheetId, campaigns, mcpContext)
+
     // Setup context sheet
-    await this.setupContextSheet(spreadsheetId, mcpContext);
-    
+    await this.setupContextSheet(spreadsheetId, mcpContext)
+
     return {
       id: spreadsheetId,
       url: `https://docs.google.com/spreadsheets/d/${spreadsheetId}`,
-    };
+    }
   }
 
   private async setupCalendarSheet(
-    spreadsheetId: string, 
-    campaigns: string[], 
+    spreadsheetId: string,
+    campaigns: string[],
     mcpContext: any
   ): Promise<void> {
     const headers = [
@@ -79,7 +79,7 @@ export class GoogleSheetsService {
       'Start Date',
       'Campaign Topic',
       'Primary Channel',
-      'Secondary Channels', 
+      'Secondary Channels',
       'Content Types',
       'Status',
       'Drive Folder',
@@ -89,7 +89,7 @@ export class GoogleSheetsService {
       'Email Status',
       'Notes',
       'Performance Metrics',
-    ];
+    ]
 
     // Add headers
     await this.sheets.spreadsheets.values.update({
@@ -99,11 +99,11 @@ export class GoogleSheetsService {
       requestBody: {
         values: [headers],
       },
-    });
+    })
 
     // Generate calendar data
-    const calendarData = this.generateCalendarData(campaigns, mcpContext);
-    
+    const calendarData = this.generateCalendarData(campaigns, mcpContext)
+
     // Add calendar data
     await this.sheets.spreadsheets.values.update({
       spreadsheetId,
@@ -112,25 +112,25 @@ export class GoogleSheetsService {
       requestBody: {
         values: calendarData,
       },
-    });
+    })
 
     // Format the sheet
-    await this.formatCalendarSheet(spreadsheetId);
+    await this.formatCalendarSheet(spreadsheetId)
   }
 
   private generateCalendarData(campaigns: string[], mcpContext: any): string[][] {
-    const data: string[][] = [];
-    const startDate = new Date();
-    
+    const data: string[][] = []
+    const startDate = new Date()
+
     // Primary and secondary channels from MCP context
-    const primaryChannels = mcpContext?.marketingGoals?.channels?.primary || ['Blog'];
-    const secondaryChannels = mcpContext?.marketingGoals?.channels?.secondary || ['Social Media'];
-    
+    const primaryChannels = mcpContext?.marketingGoals?.channels?.primary || ['Blog']
+    const secondaryChannels = mcpContext?.marketingGoals?.channels?.secondary || ['Social Media']
+
     campaigns.forEach((topic, index) => {
-      const weekNumber = index + 1;
-      const weekStartDate = new Date(startDate);
-      weekStartDate.setDate(startDate.getDate() + (index * 7));
-      
+      const weekNumber = index + 1
+      const weekStartDate = new Date(startDate)
+      weekStartDate.setDate(startDate.getDate() + index * 7)
+
       const row = [
         weekNumber.toString(),
         weekStartDate.toLocaleDateString(),
@@ -141,17 +141,17 @@ export class GoogleSheetsService {
         'Planned',
         `Week ${weekNumber.toString().padStart(2, '0')} - ${this.sanitizeTopicForFolder(topic)}`,
         'Not Started',
-        'Not Started', 
+        'Not Started',
         'Not Started',
         'Not Started',
         '',
         '',
-      ];
-      
-      data.push(row);
-    });
+      ]
 
-    return data;
+      data.push(row)
+    })
+
+    return data
   }
 
   private async setupContextSheet(spreadsheetId: string, mcpContext: any): Promise<void> {
@@ -178,13 +178,22 @@ export class GoogleSheetsService {
       [''],
       ['CONTENT PREFERENCES'],
       [''],
-      ['Blog Length', mcpContext?.contentPreferences?.lengthPreferences?.blog?.toString() || '2000'],
-      ['Social Length', mcpContext?.contentPreferences?.lengthPreferences?.social?.toString() || '280'],
-      ['Email Length', mcpContext?.contentPreferences?.lengthPreferences?.email?.toString() || '500'],
+      [
+        'Blog Length',
+        mcpContext?.contentPreferences?.lengthPreferences?.blog?.toString() || '2000',
+      ],
+      [
+        'Social Length',
+        mcpContext?.contentPreferences?.lengthPreferences?.social?.toString() || '280',
+      ],
+      [
+        'Email Length',
+        mcpContext?.contentPreferences?.lengthPreferences?.email?.toString() || '500',
+      ],
       [''],
       ['Generated on', new Date().toLocaleString()],
       ['MCP Version', mcpContext?.metadata?.version || '1.0.0'],
-    ];
+    ]
 
     await this.sheets.spreadsheets.values.update({
       spreadsheetId,
@@ -193,7 +202,7 @@ export class GoogleSheetsService {
       requestBody: {
         values: contextData,
       },
-    });
+    })
   }
 
   private async formatCalendarSheet(spreadsheetId: string): Promise<void> {
@@ -238,12 +247,12 @@ export class GoogleSheetsService {
           fields: 'gridProperties.frozenRowCount',
         },
       },
-    ];
+    ]
 
     await this.sheets.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: { requests },
-    });
+    })
   }
 
   async updateCampaignStatus(
@@ -253,16 +262,16 @@ export class GoogleSheetsService {
     status: string
   ): Promise<void> {
     const columnMap: Record<string, string> = {
-      'blog': 'I',
-      'video': 'J',
-      'social': 'K', 
-      'email': 'L',
-      'overall': 'G',
-    };
+      blog: 'I',
+      video: 'J',
+      social: 'K',
+      email: 'L',
+      overall: 'G',
+    }
 
-    const targetColumn = columnMap[column];
+    const targetColumn = columnMap[column]
     if (!targetColumn) {
-      throw new Error(`Invalid column: ${column}`);
+      throw new Error(`Invalid column: ${column}`)
     }
 
     await this.sheets.spreadsheets.values.update({
@@ -272,13 +281,13 @@ export class GoogleSheetsService {
       requestBody: {
         values: [[status]],
       },
-    });
+    })
   }
 
   private sanitizeTopicForFolder(topic: string): string {
     return topic
       .replace(/[^a-zA-Z0-9\s]/g, '')
       .replace(/\s+/g, '-')
-      .toLowerCase();
+      .toLowerCase()
   }
 }

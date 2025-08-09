@@ -32,7 +32,7 @@ export const MVP1_PLANS: PaymentPlan[] = [
       'Basic brand voice detection',
       'Target audience insights',
       'JSON export',
-      'Email support'
+      'Email support',
     ],
     popular: false,
     limitations: {
@@ -54,7 +54,7 @@ export const MVP1_PLANS: PaymentPlan[] = [
       'Visual brand analysis (colors, fonts)',
       'Business insights extraction',
       'All AI models available',
-      'Priority support'
+      'Priority support',
     ],
     popular: true,
     limitations: {
@@ -76,7 +76,7 @@ export const MVP1_PLANS: PaymentPlan[] = [
       'Bulk export capabilities',
       'White-label reports',
       'API access (coming soon)',
-      'Dedicated support'
+      'Dedicated support',
     ],
     popular: false,
     limitations: {
@@ -102,7 +102,7 @@ export const MVP2_PLANS: PaymentPlan[] = [
       'Content type recommendations',
       'Basic channel strategy',
       'CSV export',
-      'Email support'
+      'Email support',
     ],
     popular: false,
     limitations: {
@@ -126,7 +126,7 @@ export const MVP2_PLANS: PaymentPlan[] = [
       'Channel distribution strategy',
       'All AI models available',
       'Google Sheets formatting',
-      'Priority support'
+      'Priority support',
     ],
     popular: true,
     limitations: {
@@ -150,7 +150,7 @@ export const MVP2_PLANS: PaymentPlan[] = [
       'Quarterly strategy reports',
       'White-label exports',
       'API access (coming soon)',
-      'Dedicated support'
+      'Dedicated support',
     ],
     popular: false,
     limitations: {
@@ -176,7 +176,7 @@ export const MVP3_PLANS: PaymentPlan[] = [
       'Keyword integration',
       'Professional structure',
       'Markdown export',
-      'Email support'
+      'Email support',
     ],
     popular: false,
     limitations: {
@@ -199,7 +199,7 @@ export const MVP3_PLANS: PaymentPlan[] = [
       'Campaign calendar integration',
       'Multiple export formats',
       'Real-time editing interface',
-      'Priority support'
+      'Priority support',
     ],
     popular: true,
     limitations: {
@@ -223,7 +223,7 @@ export const MVP3_PLANS: PaymentPlan[] = [
       'White-label exports',
       'Bulk generation tools',
       'Content series planning',
-      'Dedicated support'
+      'Dedicated support',
     ],
     popular: false,
     limitations: {
@@ -269,14 +269,14 @@ export class StripePaymentProcessor {
   }): Promise<{ sessionId: string; checkoutUrl: string }> {
     try {
       const allPlans = [...MVP1_PLANS, ...MVP2_PLANS, ...MVP3_PLANS]
-      const plan = allPlans.find(p => p.id === options.planId)
+      const plan = allPlans.find((p) => p.id === options.planId)
       if (!plan) {
         throw new Error(`Invalid plan ID: ${options.planId}`)
       }
 
       // In production, this would call the real Stripe API
       const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      
+
       const session: PaymentSession = {
         sessionId,
         planId: options.planId,
@@ -300,7 +300,9 @@ export class StripePaymentProcessor {
       return { sessionId, checkoutUrl }
     } catch (error) {
       console.error('❌ Payment session creation failed:', error)
-      throw new Error(`Failed to create payment session: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to create payment session: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
@@ -316,7 +318,7 @@ export class StripePaymentProcessor {
     try {
       // In production, this would verify with Stripe webhook
       const session = this.sessions.get(sessionId)
-      
+
       if (!session) {
         return { success: false }
       }
@@ -358,12 +360,15 @@ export class StripePaymentProcessor {
 
 // Payment state management
 export class PaymentStateManager {
-  private purchases: Map<string, {
-    email: string
-    planId: string
-    purchasedAt: string
-    analysesUsed: number
-  }> = new Map()
+  private purchases: Map<
+    string,
+    {
+      email: string
+      planId: string
+      purchasedAt: string
+      analysesUsed: number
+    }
+  > = new Map()
 
   /**
    * Record successful purchase
@@ -379,7 +384,10 @@ export class PaymentStateManager {
 
     // Save to localStorage for persistence
     if (typeof window !== 'undefined') {
-      localStorage.setItem('slotted_purchases', JSON.stringify(Array.from(this.purchases.entries())))
+      localStorage.setItem(
+        'slotted_purchases',
+        JSON.stringify(Array.from(this.purchases.entries()))
+      )
     }
   }
 
@@ -387,14 +395,13 @@ export class PaymentStateManager {
    * Check remaining analyses for user
    */
   public getRemainingAnalyses(email: string): number {
-    const userPurchases = Array.from(this.purchases.values())
-      .filter(p => p.email === email)
+    const userPurchases = Array.from(this.purchases.values()).filter((p) => p.email === email)
 
     let totalRemaining = 0
-    
+
     for (const purchase of userPurchases) {
       const allPlans = [...MVP1_PLANS, ...MVP2_PLANS, ...MVP3_PLANS]
-      const plan = allPlans.find(p => p.id === purchase.planId)
+      const plan = allPlans.find((p) => p.id === purchase.planId)
       if (plan && plan.limitations.analysesPerMonth) {
         const remaining = plan.limitations.analysesPerMonth - purchase.analysesUsed
         totalRemaining += Math.max(0, remaining)
@@ -416,7 +423,9 @@ export class PaymentStateManager {
     // Find the most recent purchase and increment usage
     const userPurchases = Array.from(this.purchases.entries())
       .filter(([_, p]) => p.email === email)
-      .sort(([_, a], [__, b]) => new Date(b.purchasedAt).getTime() - new Date(a.purchasedAt).getTime())
+      .sort(
+        ([_, a], [__, b]) => new Date(b.purchasedAt).getTime() - new Date(a.purchasedAt).getTime()
+      )
 
     if (userPurchases.length > 0) {
       const [key, purchase] = userPurchases[0]
@@ -425,7 +434,10 @@ export class PaymentStateManager {
 
       // Update localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('slotted_purchases', JSON.stringify(Array.from(this.purchases.entries())))
+        localStorage.setItem(
+          'slotted_purchases',
+          JSON.stringify(Array.from(this.purchases.entries()))
+        )
       }
     }
 

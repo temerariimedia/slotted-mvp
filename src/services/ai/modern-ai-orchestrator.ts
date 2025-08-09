@@ -1,6 +1,6 @@
-import { ChatOpenAI } from '@langchain/openai'
-import { ChatAnthropic } from '@langchain/anthropic'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { ChatAnthropic } from '@langchain/anthropic'
+import { ChatOpenAI } from '@langchain/openai'
 import { z } from 'zod'
 
 // Modern AI provider configuration
@@ -11,7 +11,7 @@ export const AIModelSchema = z.enum([
   'claude-3-5-sonnet-20241022',
   'claude-3-5-haiku-20241022',
   'gemini-2.0-flash',
-  'gemini-1.5-pro'
+  'gemini-1.5-pro',
 ])
 
 export type AIProvider = z.infer<typeof AIProviderSchema>
@@ -81,7 +81,7 @@ export class ModernAIOrchestrator {
   public configureProvider(config: AIConfig): void {
     // Validate configuration
     const validatedConfig = AIConfigSchema.parse(config)
-    
+
     const key = `${config.provider}-${config.model}`
     this.configs.set(key, validatedConfig)
 
@@ -132,7 +132,7 @@ export class ModernAIOrchestrator {
       // 1. Scrape website if provided
       let websiteContent = ''
       let websiteAnalyzed = false
-      
+
       if (input.website) {
         websiteContent = await this.scrapeWebsite(input.website)
         websiteAnalyzed = true
@@ -168,7 +168,9 @@ export class ModernAIOrchestrator {
       return companyDNA
     } catch (error) {
       console.error('❌ Company DNA extraction failed:', error)
-      throw new Error(`Failed to extract company DNA: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to extract company DNA: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
@@ -178,15 +180,17 @@ export class ModernAIOrchestrator {
   private async scrapeWebsite(url: string): Promise<string> {
     try {
       console.log(`🔍 Scraping website: ${url}`)
-      
+
       // Use enhanced website analyzer
-      const { enhancedWebsiteAnalyzer } = await import('../web-automation/enhanced-website-analyzer')
-      
+      const { enhancedWebsiteAnalyzer } = await import(
+        '../web-automation/enhanced-website-analyzer'
+      )
+
       await enhancedWebsiteAnalyzer.initialize()
       const analysis = await enhancedWebsiteAnalyzer.analyzeWebsite(url)
       const content = enhancedWebsiteAnalyzer.extractContentForAI(analysis)
       await enhancedWebsiteAnalyzer.cleanup()
-      
+
       console.log(`✅ Successfully analyzed website: ${url}`)
       return content
     } catch (error) {
@@ -205,7 +209,7 @@ export class ModernAIOrchestrator {
     description?: string
   }): Promise<any> {
     const model = this.getDefaultModel()
-    
+
     const prompt = `
 You are an expert brand strategist analyzing a company to extract comprehensive brand DNA.
 
@@ -272,12 +276,14 @@ Return only valid JSON, no additional text.`
       return analysis
     } catch (error) {
       console.error('❌ Brand analysis failed:', error)
-      
+
       // Return fallback analysis
       return {
         industry: input.industry || 'Technology',
         estimatedSize: 'startup',
-        description: input.description || `${input.companyName} is a company in the ${input.industry || 'technology'} industry.`,
+        description:
+          input.description ||
+          `${input.companyName} is a company in the ${input.industry || 'technology'} industry.`,
         brandDNA: {
           valuePropositions: ['Innovation', 'Quality', 'Customer Focus'],
           coreOfferings: ['Primary Service'],
@@ -334,6 +340,83 @@ Return only valid JSON, no additional text.`
   }
 
   /**
+   * Generate content using the configured AI providers
+   */
+  public async generateContent({
+    prompt,
+    context,
+    temperature = 0.7,
+    provider = 'openai',
+    model = 'gpt-4o'
+  }: {
+    prompt: string
+    context?: string
+    temperature?: number
+    provider?: AIProvider
+    model?: AIModel
+  }): Promise<{ content: string; provider: string; model: string }> {
+    const key = `${provider}-${model}`
+    const aiModel = this.models.get(key)
+    const config = this.configs.get(key)
+
+    if (!aiModel || !config) {
+      // Auto-configure with environment variables if available
+      try {
+        const apiKey = this.getApiKeyForProvider(provider)
+        this.configureProvider({ provider, model, apiKey, temperature })
+      } catch (error) {
+        throw new Error(`AI provider ${provider} not configured and cannot auto-configure: ${error}`)
+      }
+    }
+
+    try {
+      let content: string
+
+      switch (provider) {
+        case 'openai':
+        case 'anthropic':
+          const response = await aiModel.invoke([
+            { role: 'user', content: context ? `Context: ${context}\n\nTask: ${prompt}` : prompt }
+          ])
+          content = response.content
+          break
+
+        case 'google':
+          const geminiModel = aiModel.getGenerativeModel({ model })
+          const result = await geminiModel.generateContent(
+            context ? `Context: ${context}\n\nTask: ${prompt}` : prompt
+          )
+          content = result.response.text()
+          break
+
+        default:
+          throw new Error(`Unsupported provider: ${provider}`)
+      }
+
+      return { content, provider, model }
+    } catch (error) {
+      console.error(`AI generation failed for ${provider}:`, error)
+      throw new Error(`Content generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Get API key for provider from environment
+   */
+  private getApiKeyForProvider(provider: AIProvider): string {
+    switch (provider) {
+      case 'openai':
+        return import.meta.env.VITE_OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || ''
+      case 'anthropic':
+        return import.meta.env.VITE_ANTHROPIC_API_KEY || process.env.VITE_ANTHROPIC_API_KEY || ''
+      case 'google':
+        return import.meta.env.VITE_GOOGLE_AI_API_KEY || process.env.VITE_GOOGLE_AI_API_KEY || ''
+      default:
+        throw new Error(`Unknown provider: ${provider}`)
+    }
+  }
+
+  /**
    * Export company DNA as JSON
    */
   public exportCompanyDNA(dna: CompanyDNA): string {
@@ -348,7 +431,9 @@ Return only valid JSON, no additional text.`
       const parsed = JSON.parse(jsonString)
       return CompanyDNASchema.parse(parsed)
     } catch (error) {
-      throw new Error(`Invalid company DNA JSON: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Invalid company DNA JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 

@@ -72,17 +72,17 @@ export class ModernMCPContextEngine {
       inputSchema: {
         type: 'object',
         properties: {
-          contentType: { 
-            type: 'string', 
+          contentType: {
+            type: 'string',
             enum: ['blog', 'social', 'email', 'video-script'],
-            description: 'Type of content to generate' 
+            description: 'Type of content to generate',
           },
           topic: { type: 'string', description: 'Content topic or theme' },
           length: { type: 'number', description: 'Desired content length' },
-          tone: { 
+          tone: {
             type: 'string',
             enum: ['professional', 'casual', 'friendly', 'authoritative'],
-            description: 'Content tone'
+            description: 'Content tone',
           },
         },
         required: ['contentType', 'topic'],
@@ -109,7 +109,7 @@ export class ModernMCPContextEngine {
 
       // Try other storage methods (Supabase, etc.)
       // TODO: Implement database loading
-      
+
       return null
     } catch (error) {
       console.error('❌ Failed to load MCP context:', error)
@@ -128,22 +128,22 @@ export class ModernMCPContextEngine {
         extractedAt: new Date().toISOString(),
         version: '2.0.0',
       }
-      
+
       this.context = context
-      
+
       // Save to localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('slotted_company_dna_v2', JSON.stringify(context))
       }
 
       // TODO: Save to database (Supabase)
-      
+
       // Update MCP resources
       this.updateMCPResources(context)
-      
+
       // Notify listeners
       this.notifyListeners()
-      
+
       console.log('✅ Company DNA saved successfully')
     } catch (error) {
       console.error('❌ Failed to save MCP context:', error)
@@ -288,7 +288,9 @@ USE THIS CONTEXT FOR:
       // TODO: Add schema validation for imported context
       await this.saveContext(parsed)
     } catch (error) {
-      throw new Error(`Invalid context JSON: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Invalid context JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
@@ -317,7 +319,7 @@ USE THIS CONTEXT FOR:
 
     // TODO: Implement actual tool execution logic
     console.log(`🔧 Executing MCP tool: ${toolName}`, parameters)
-    
+
     // For now, return a placeholder response
     return {
       success: true,
@@ -341,7 +343,7 @@ USE THIS CONTEXT FOR:
    */
   private notifyListeners(): void {
     if (this.context) {
-      this.listeners.forEach(listener => listener(this.context!))
+      this.listeners.forEach((listener) => listener(this.context!))
     }
   }
 
@@ -365,11 +367,11 @@ USE THIS CONTEXT FOR:
   public async clearContext(): Promise<void> {
     this.context = null
     this.resources.clear()
-    
+
     if (typeof window !== 'undefined') {
       localStorage.removeItem('slotted_company_dna_v2')
     }
-    
+
     this.initializeDefaultTools()
     console.log('🗑️ MCP context cleared')
   }

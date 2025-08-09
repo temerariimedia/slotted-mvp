@@ -1,5 +1,10 @@
-import React, { useState } from 'react'
-import { MVP2_PLANS, stripeProcessor, type PaymentPlan } from '@/services/payments/stripe-integration'
+import {
+  MVP2_PLANS,
+  type PaymentPlan,
+  stripeProcessor,
+} from '@/services/payments/stripe-integration'
+import type React from 'react'
+import { useState } from 'react'
 
 interface MVP2PricingPlansProps {
   onPlanSelected: (planId: string) => void
@@ -7,10 +12,10 @@ interface MVP2PricingPlansProps {
   companyDNA?: any
 }
 
-export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({ 
-  onPlanSelected, 
+export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
+  onPlanSelected,
   currentUserEmail,
-  companyDNA 
+  companyDNA,
 }) => {
   const [isProcessing, setIsProcessing] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
@@ -38,7 +43,7 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
       // In production, redirect to Stripe checkout
       // For demo, simulate immediate success
       console.log(`Redirecting to: ${session.checkoutUrl}`)
-      
+
       // Simulate payment success after 2 seconds
       setTimeout(() => {
         alert(`Payment successful! You now have access to ${plan.name}`)
@@ -46,7 +51,6 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
         setIsProcessing(false)
         setSelectedPlan(null)
       }, 2000)
-
     } catch (error) {
       console.error('Payment failed:', error)
       alert('Payment failed. Please try again.')
@@ -63,7 +67,7 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
             Choose Your Marketing Calendar Plan
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Generate comprehensive 13-week marketing calendars with strategic campaign planning. 
+            Generate comprehensive 13-week marketing calendars with strategic campaign planning.
             Choose the plan that fits your business needs.
           </p>
         </div>
@@ -74,7 +78,11 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <div className="ml-3">
@@ -82,7 +90,8 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
                   Company DNA Integration Available
                 </h3>
                 <div className="mt-1 text-sm text-green-700">
-                  Your calendar will be personalized using DNA from: <strong>{companyDNA.company.name}</strong>
+                  Your calendar will be personalized using DNA from:{' '}
+                  <strong>{companyDNA.company.name}</strong>
                 </div>
               </div>
             </div>
@@ -91,14 +100,10 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
 
         {/* User Input Form */}
         <div className="max-w-md mx-auto mb-8 p-6 bg-gray-50 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Your Information
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Information</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <input
                 type="email"
                 value={userEmail}
@@ -109,9 +114,7 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Company Name
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
               <input
                 type="text"
                 value={companyName}
@@ -130,8 +133,8 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
             <div
               key={plan.id}
               className={`relative bg-white rounded-2xl shadow-lg border-2 transition-all duration-200 ${
-                plan.popular 
-                  ? 'border-blue-500 transform scale-105' 
+                plan.popular
+                  ? 'border-blue-500 transform scale-105'
                   : 'border-gray-200 hover:border-blue-300'
               }`}
             >
@@ -145,12 +148,8 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
 
               <div className="p-8">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    {plan.name}
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    {plan.description}
-                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                  <p className="text-gray-600 mb-4">{plan.description}</p>
                   <div className="text-4xl font-bold text-gray-900 mb-2">
                     ${plan.price}
                     <span className="text-lg font-normal text-gray-600">
@@ -162,8 +161,16 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
-                      <svg className="w-5 h-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <svg
+                        className="w-5 h-5 text-green-500 mt-0.5 mr-3 flex-shrink-0"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span className="text-gray-700">{feature}</span>
                     </li>
@@ -191,8 +198,16 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
 
                 {/* Plan limitations */}
                 <div className="mt-4 text-xs text-gray-500">
-                  <p>• {plan.limitations.analysesPerMonth} calendar{plan.limitations.analysesPerMonth !== 1 ? 's' : ''}</p>
-                  <p>• {plan.limitations.websiteAnalysis ? 'Company DNA integration' : 'Basic calendar only'}</p>
+                  <p>
+                    • {plan.limitations.analysesPerMonth} calendar
+                    {plan.limitations.analysesPerMonth !== 1 ? 's' : ''}
+                  </p>
+                  <p>
+                    •{' '}
+                    {plan.limitations.websiteAnalysis
+                      ? 'Company DNA integration'
+                      : 'Basic calendar only'}
+                  </p>
                   <p>• AI models: {plan.limitations.aiModels.join(', ')}</p>
                   <p>• Export formats: {plan.limitations.exportFormats.join(', ').toUpperCase()}</p>
                 </div>
@@ -209,43 +224,72 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="w-8 h-8 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 13-Week Strategic Planning
               </h4>
               <p className="text-gray-600">
-                Get a complete quarterly marketing strategy with campaign themes, content types, and optimal timing.
+                Get a complete quarterly marketing strategy with campaign themes, content types, and
+                optimal timing.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                10 Minutes vs 10 Hours
-              </h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">10 Minutes vs 10 Hours</h4>
               <p className="text-gray-600">
-                Generate comprehensive marketing calendars in minutes instead of spending days planning campaigns.
+                Generate comprehensive marketing calendars in minutes instead of spending days
+                planning campaigns.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                <svg
+                  className="w-8 h-8 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                Ready-to-Use Exports
-              </h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Ready-to-Use Exports</h4>
               <p className="text-gray-600">
-                Export directly to Google Sheets, CSV, or JSON format for immediate use in your existing tools.
+                Export directly to Google Sheets, CSV, or JSON format for immediate use in your
+                existing tools.
               </p>
             </div>
           </div>
@@ -256,12 +300,17 @@ export const MVP2PricingPlans: React.FC<MVP2PricingPlansProps> = ({
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-md mx-auto">
             <div className="flex items-center justify-center mb-2">
               <svg className="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
               <span className="text-green-800 font-semibold">100% Satisfaction Guarantee</span>
             </div>
             <p className="text-green-700 text-sm">
-              Not happy with your marketing calendar? Get a full refund within 7 days, no questions asked.
+              Not happy with your marketing calendar? Get a full refund within 7 days, no questions
+              asked.
             </p>
           </div>
         </div>

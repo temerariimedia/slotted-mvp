@@ -1,13 +1,31 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
   "build": {
     "env": {
-      "ENABLE_FILE_SYSTEM_API": "1"
+      "ENABLE_FILE_SYSTEM_API": "1",
+      "NODE_ENV": "production",
+      "VITE_APP_ENV": "vercel"
     }
   },
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

@@ -136,8 +136,9 @@ export default function ComprehensiveOnboarding({ onComplete }: ComprehensiveOnb
   const CurrentStepComponent = currentStep.component
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="max-w-6xl mx-auto p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10" />
+      <div className="max-w-6xl mx-auto p-6 relative">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -166,40 +167,61 @@ export default function ComprehensiveOnboarding({ onComplete }: ComprehensiveOnb
           </div>
 
           {/* Step Progress Indicators */}
-          <div className="flex items-center space-x-2 mb-6 overflow-x-auto pb-2">
+          <div className="flex items-center space-x-3 mb-6 overflow-x-auto pb-2">
             {steps.map((step, index) => (
-              <button
+              <motion.button
                 key={step.id}
                 onClick={() => handleSkipToStep(index)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex-shrink-0 ${
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex-shrink-0 ${
                   index === currentStepIndex
-                    ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-200/50'
                     : index < currentStepIndex
-                    ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                    : 'bg-gray-100 text-gray-500 border-2 border-gray-200 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-200/50'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:shadow-md hover:border-gray-300'
                 }`}
               >
-                {step.completed || index < currentStepIndex ? (
-                  <CheckCircle2 className="h-4 w-4" />
-                ) : (
-                  <span className="w-4 h-4 rounded-full border-2 border-current flex-shrink-0" />
-                )}
+                <motion.div
+                  initial={false}
+                  animate={{ 
+                    scale: step.completed || index < currentStepIndex ? 1 : 1,
+                    rotate: step.completed || index < currentStepIndex ? 0 : 0 
+                  }}
+                  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                >
+                  {step.completed || index < currentStepIndex ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <span className="w-4 h-4 rounded-full border-2 border-current flex-shrink-0" />
+                  )}
+                </motion.div>
                 <span className="whitespace-nowrap">{step.title}</span>
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <motion.div 
+          className="bg-white rounded-2xl shadow-xl border border-gray-100/50 overflow-hidden backdrop-blur-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
           <div className="p-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ 
+                  duration: 0.4, 
+                  ease: [0.4, 0.0, 0.2, 1],
+                  layout: { duration: 0.3 }
+                }}
               >
                 <CurrentStepComponent
                   onNext={handleNext}
@@ -210,7 +232,7 @@ export default function ComprehensiveOnboarding({ onComplete }: ComprehensiveOnb
               </motion.div>
             </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
 
         {/* Footer Navigation */}
         <div className="flex justify-between items-center mt-8">

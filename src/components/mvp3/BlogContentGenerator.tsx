@@ -1,8 +1,13 @@
-import React, { useState } from 'react'
-import { BlogContentGenerator, type BlogPost, type BlogGenerationOptions } from '@/services/content/blog-content-generator'
-import { modernAIOrchestrator, type CompanyDNA } from '@/services/ai/modern-ai-orchestrator'
-import { type CampaignTopic } from '@/services/campaigns/campaign-generator'
+import { type CompanyDNA, modernAIOrchestrator } from '@/services/ai/modern-ai-orchestrator'
+import type { CampaignTopic } from '@/services/campaigns/campaign-generator'
+import {
+  BlogContentGenerator,
+  type BlogGenerationOptions,
+  type BlogPost,
+} from '@/services/content/blog-content-generator'
 import { paymentStateManager } from '@/services/payments/stripe-integration'
+import type React from 'react'
+import { useState } from 'react'
 
 interface BlogContentGeneratorProps {
   companyDNA?: CompanyDNA
@@ -15,7 +20,7 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
   companyDNA,
   campaignTopic,
   userEmail,
-  onBlogGenerated
+  onBlogGenerated,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedBlog, setGeneratedBlog] = useState<BlogPost | null>(null)
@@ -106,9 +111,9 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
     try {
       const generator = new BlogContentGenerator(null)
       const exportedContent = await generator.exportBlogPost(generatedBlog, format)
-      
-      const blob = new Blob([exportedContent], { 
-        type: format === 'json' ? 'application/json' : 'text/plain' 
+
+      const blob = new Blob([exportedContent], {
+        type: format === 'json' ? 'application/json' : 'text/plain',
       })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -125,22 +130,22 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
   }
 
   const handleTopicChange = (topic: string) => {
-    setGenerationOptions(prev => ({ ...prev, topic }))
+    setGenerationOptions((prev) => ({ ...prev, topic }))
   }
 
   const handleKeywordAdd = (keyword: string) => {
     if (keyword.trim() && !generationOptions.targetKeywords?.includes(keyword.trim())) {
-      setGenerationOptions(prev => ({
+      setGenerationOptions((prev) => ({
         ...prev,
-        targetKeywords: [...(prev.targetKeywords || []), keyword.trim()]
+        targetKeywords: [...(prev.targetKeywords || []), keyword.trim()],
       }))
     }
   }
 
   const handleKeywordRemove = (keyword: string) => {
-    setGenerationOptions(prev => ({
+    setGenerationOptions((prev) => ({
       ...prev,
-      targetKeywords: prev.targetKeywords?.filter(k => k !== keyword) || []
+      targetKeywords: prev.targetKeywords?.filter((k) => k !== keyword) || [],
     }))
   }
 
@@ -148,9 +153,7 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
     <div className="max-w-6xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            📝 Blog Content Generator
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">📝 Blog Content Generator</h2>
           <p className="text-xl text-gray-600">
             Create professional 2000+ word blog posts with perfect brand voice consistency
           </p>
@@ -173,7 +176,9 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
               </div>
               <div>
                 <span className="font-medium text-blue-800">Target Audience:</span>
-                <span className="ml-2 text-blue-700">{companyDNA.brandDNA.targetAudience.demographics}</span>
+                <span className="ml-2 text-blue-700">
+                  {companyDNA.brandDNA.targetAudience.demographics}
+                </span>
               </div>
             </div>
           </div>
@@ -205,14 +210,12 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
         {/* Blog Configuration */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Blog Configuration</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Topic and Settings */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Blog Topic *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Blog Topic *</label>
                 <input
                   type="text"
                   value={generationOptions.topic || ''}
@@ -229,7 +232,12 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                 </label>
                 <select
                   value={generationOptions.contentLength}
-                  onChange={(e) => setGenerationOptions(prev => ({ ...prev, contentLength: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setGenerationOptions((prev) => ({
+                      ...prev,
+                      contentLength: Number.parseInt(e.target.value),
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   disabled={isGenerating}
                 >
@@ -241,12 +249,12 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Writing Tone
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Writing Tone</label>
                 <select
                   value={generationOptions.tone}
-                  onChange={(e) => setGenerationOptions(prev => ({ ...prev, tone: e.target.value as any }))}
+                  onChange={(e) =>
+                    setGenerationOptions((prev) => ({ ...prev, tone: e.target.value as any }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   disabled={isGenerating}
                 >
@@ -263,7 +271,12 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                 </label>
                 <select
                   value={generationOptions.callToActionType}
-                  onChange={(e) => setGenerationOptions(prev => ({ ...prev, callToActionType: e.target.value as any }))}
+                  onChange={(e) =>
+                    setGenerationOptions((prev) => ({
+                      ...prev,
+                      callToActionType: e.target.value as any,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   disabled={isGenerating}
                 >
@@ -282,7 +295,9 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                   </label>
                   <textarea
                     value={generationOptions.customCTA || ''}
-                    onChange={(e) => setGenerationOptions(prev => ({ ...prev, customCTA: e.target.value }))}
+                    onChange={(e) =>
+                      setGenerationOptions((prev) => ({ ...prev, customCTA: e.target.value }))
+                    }
                     placeholder="Enter your custom call-to-action text..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     rows={3}
@@ -297,7 +312,7 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Target Keywords
               </label>
-              
+
               <div className="mb-3">
                 <div className="flex space-x-2">
                   <input
@@ -314,7 +329,9 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                   />
                   <button
                     onClick={() => {
-                      const input = document.querySelector('input[placeholder="Add keyword..."]') as HTMLInputElement
+                      const input = document.querySelector(
+                        'input[placeholder="Add keyword..."]'
+                      ) as HTMLInputElement
                       if (input?.value) {
                         handleKeywordAdd(input.value)
                         input.value = ''
@@ -330,7 +347,10 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
 
               <div className="space-y-2 max-h-32 overflow-y-auto">
                 {generationOptions.targetKeywords?.map((keyword, index) => (
-                  <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded"
+                  >
                     <span className="text-sm text-gray-700">{keyword}</span>
                     <button
                       onClick={() => handleKeywordRemove(keyword)}
@@ -343,7 +363,8 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                 ))}
               </div>
 
-              {(!generationOptions.targetKeywords || generationOptions.targetKeywords.length === 0) && (
+              {(!generationOptions.targetKeywords ||
+                generationOptions.targetKeywords.length === 0) && (
                 <p className="text-sm text-gray-500 mt-2">
                   Keywords will be auto-generated if none provided
                 </p>
@@ -355,18 +376,25 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                   <input
                     type="checkbox"
                     checked={generationOptions.seoOptimization}
-                    onChange={(e) => setGenerationOptions(prev => ({ ...prev, seoOptimization: e.target.checked }))}
+                    onChange={(e) =>
+                      setGenerationOptions((prev) => ({
+                        ...prev,
+                        seoOptimization: e.target.checked,
+                      }))
+                    }
                     disabled={isGenerating}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="ml-2 text-sm text-gray-700">Advanced SEO optimization</span>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     checked={generationOptions.includeImages}
-                    onChange={(e) => setGenerationOptions(prev => ({ ...prev, includeImages: e.target.checked }))}
+                    onChange={(e) =>
+                      setGenerationOptions((prev) => ({ ...prev, includeImages: e.target.checked }))
+                    }
                     disabled={isGenerating}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
@@ -386,8 +414,8 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                 <span className="text-sm text-gray-500">{progress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
@@ -421,9 +449,7 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
         {generatedBlog && (
           <div className="border-t pt-8">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">
-                📝 Generated Blog Post
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-900">📝 Generated Blog Post</h3>
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleExportBlog('markdown')}
@@ -449,22 +475,30 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
             {/* Blog Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-gray-50 p-4 rounded-lg text-center">
-                <div className="text-2xl font-bold text-gray-900">{generatedBlog.metadata.wordCount}</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {generatedBlog.metadata.wordCount}
+                </div>
                 <div className="text-sm text-gray-600">Words</div>
               </div>
-              
+
               <div className="bg-blue-50 p-4 rounded-lg text-center">
-                <div className="text-2xl font-bold text-blue-600">{Math.round(generatedBlog.seoScore)}</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {Math.round(generatedBlog.seoScore)}
+                </div>
                 <div className="text-sm text-gray-600">SEO Score</div>
               </div>
-              
+
               <div className="bg-green-50 p-4 rounded-lg text-center">
-                <div className="text-2xl font-bold text-green-600">{Math.round(generatedBlog.brandConsistencyScore * 100)}%</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {Math.round(generatedBlog.brandConsistencyScore * 100)}%
+                </div>
                 <div className="text-sm text-gray-600">Brand Consistency</div>
               </div>
-              
+
               <div className="bg-purple-50 p-4 rounded-lg text-center">
-                <div className="text-2xl font-bold text-purple-600">{generatedBlog.estimatedReadTime}</div>
+                <div className="text-2xl font-bold text-purple-600">
+                  {generatedBlog.estimatedReadTime}
+                </div>
                 <div className="text-sm text-gray-600">Min Read</div>
               </div>
             </div>
@@ -476,7 +510,7 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                 <p className="text-lg text-gray-600 mb-2">{generatedBlog.subtitle}</p>
               )}
               <p className="text-sm text-gray-500 mb-4">{generatedBlog.metaDescription}</p>
-              
+
               <div className="flex flex-wrap gap-2">
                 {generatedBlog.keywords.map((keyword, index) => (
                   <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
@@ -495,7 +529,7 @@ export const BlogContentGeneratorComponent: React.FC<BlogContentGeneratorProps> 
                 </pre>
               </div>
             </div>
-            
+
             {generatedBlog.content.length > 1000 && (
               <p className="text-center text-sm text-gray-500 mt-2">
                 Preview showing first 1000 characters. Export for full content.
