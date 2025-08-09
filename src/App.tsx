@@ -268,7 +268,12 @@ export const App: React.FC = () => {
               )
 
             default:
-              return <LandingPage appState={appState} setAppState={setAppState} />
+              return (
+                <SlottedStartPage
+                  onBeginOnboarding={() => setAppState((prev) => ({ ...prev, currentView: 'onboarding' }))}
+                  onSkipToDashboard={() => setAppState((prev) => ({ ...prev, currentView: 'landing' }))}
+                />
+              )
           }
         })()}
       </div>
