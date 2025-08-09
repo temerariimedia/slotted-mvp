@@ -27,41 +27,24 @@ export default function SlottedStartPage({
       <div className="relative flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Hero Section */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16 max-w-full sm:max-w-3xl lg:max-w-5xl xl:max-w-6xl">
-          <div className="inline-flex items-center px-3 py-2 sm:px-4 rounded-full bg-blue-100 text-blue-700 text-sm sm:text-base font-medium mb-4 sm:mb-6">
-            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                clipRule="evenodd"
-              />
-            </svg>
-            AI-Powered Marketing Platform
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-900 mb-4 sm:mb-6 tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-blue-600 mb-3 sm:mb-4 tracking-tight leading-tight">
             SLOTTED
           </h1>
-
-          <p className="text-base sm:text-lg lg:text-xl text-slate-700 font-normal mb-6 sm:mb-8 leading-relaxed px-4">
-            Transform your marketing strategy with intelligent
-            <span className="font-semibold text-blue-700"> AI-driven content creation </span>
-            and campaign orchestration
-          </p>
-
+          <h2 className="text-xl sm:text-2xl lg:text-3xl text-slate-800 mb-3 sm:mb-5 font-medium">
+            AI-Powered Marketing Command Center
+          </h2>
           <p className="text-sm sm:text-base lg:text-lg text-slate-600 max-w-full sm:max-w-2xl lg:max-w-3xl mx-auto leading-relaxed px-4">
-            From strategic planning to content generation, SLOTTED streamlines your entire marketing
-            workflow with powerful automation and intelligent insights.
+            A comprehensive platform for planning, organizing, and generating marketing content with intelligent AI assistance.
           </p>
         </div>
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12 lg:mb-16 w-full max-w-full sm:max-w-3xl lg:max-w-5xl xl:max-w-6xl">
           <div className="group relative sm:col-span-1">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl sm:rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-200"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-xl sm:rounded-2xl border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-105 transition-transform duration-200">
+            <div className="relative bg-white p-6 sm:p-8 rounded-xl sm:rounded-2xl border border-slate-200 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-105 transition-transform duration-200">
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                  className="w-5 h-5 sm:w-6 sm:h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -75,20 +58,19 @@ export default function SlottedStartPage({
                 </svg>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 sm:mb-3">
-                Smart Calendar
+                Marketing Calendar
               </h3>
               <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-                Plan and orchestrate campaigns across all channels with AI-powered scheduling
+                Plan and visualize content across all your platforms
               </p>
             </div>
           </div>
 
           <div className="group relative sm:col-span-1">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl sm:rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-200"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-xl sm:rounded-2xl border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-105 transition-transform duration-200">
+            <div className="relative bg-white p-6 sm:p-8 rounded-xl sm:rounded-2xl border border-slate-200 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-105 transition-transform duration-200">
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                  className="w-5 h-5 sm:w-6 sm:h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -102,20 +84,19 @@ export default function SlottedStartPage({
                 </svg>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 sm:mb-3">
-                AI Generation
+                AI Content Generation
               </h3>
               <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-                Generate compelling content across formats with advanced AI models
+                Create engaging content with intelligent AI assistance
               </p>
             </div>
           </div>
 
           <div className="group relative sm:col-span-2 lg:col-span-1">
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl sm:rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-200"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-xl sm:rounded-2xl border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-105 transition-transform duration-200">
+            <div className="relative bg-white p-6 sm:p-8 rounded-xl sm:rounded-2xl border border-slate-200 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-105 transition-transform duration-200">
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                  className="w-5 h-5 sm:w-6 sm:h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -129,10 +110,10 @@ export default function SlottedStartPage({
                 </svg>
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 sm:mb-3">
-                Smart Analytics
+                Performance Tracking
               </h3>
               <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-                Track performance and optimize campaigns with real-time insights
+                Measure and optimize your marketing efforts
               </p>
             </div>
           </div>
@@ -141,21 +122,20 @@ export default function SlottedStartPage({
         {/* CTA Section */}
         <div className="relative w-full max-w-full sm:max-w-2xl lg:max-w-3xl">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl sm:rounded-3xl blur opacity-15"></div>
-          <div className="relative bg-white/90 backdrop-blur-sm p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-white/40 shadow-xl text-center">
+            <div className="relative bg-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl text-center">
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-3 sm:mb-4">
-              Ready to Transform Your Marketing?
+              Get Started in Minutes
             </h2>
             <p className="text-sm sm:text-base lg:text-lg text-slate-700 mb-6 sm:mb-8 leading-relaxed px-2">
-              Join thousands of marketers who've accelerated their growth with SLOTTED's intelligent
-              automation.
+              SLOTTED guides you through a simple onboarding process to set up your marketing foundation and create your first AI-generated content.
             </p>
 
-            <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
               <button
                 onClick={onBeginOnboarding}
                 className="group relative inline-flex items-center justify-center min-h-[48px] px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl sm:rounded-2xl hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl touch-manipulation"
               >
-                <span className="relative z-10">Start Free Setup</span>
+                <span className="relative z-10">Begin Onboarding</span>
                 <svg
                   className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200"
                   fill="none"
@@ -175,7 +155,7 @@ export default function SlottedStartPage({
                 onClick={onSkipToDashboard}
                 className="inline-flex items-center justify-center min-h-[48px] px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-slate-700 bg-white border-2 border-slate-300 rounded-xl sm:rounded-2xl hover:border-slate-400 hover:bg-slate-50 transition-all duration-200 shadow-md hover:shadow-lg touch-manipulation"
               >
-                <span>Explore Dashboard</span>
+                <span>Skip Onboarding and Go to Dashboard</span>
                 <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"

@@ -5,6 +5,7 @@ import { CompanyDNAExtractor } from './components/mvp1/CompanyDNAExtractor'
 import { MarketingCalendarGenerator } from './components/mvp2/MarketingCalendarGenerator'
 // import MarketingPlanner from './components/planning/MarketingPlanner'
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard'
+import SlottedStartPage from './components/SlottedStartPage'
 import { SlottedContextProvider } from './contexts/SlottedContext'
 import type { CompanyDNA } from './services/ai/modern-ai-orchestrator'
 import type { MarketingCalendar } from './services/campaigns/campaign-generator'
@@ -90,7 +91,10 @@ export const App: React.FC = () => {
           switch (appState.currentView) {
             case 'welcome':
               return (
-                <OnboardingWizard onComplete={handleOnboardingComplete} />
+                <SlottedStartPage
+                  onBeginOnboarding={() => setAppState((prev) => ({ ...prev, currentView: 'onboarding' }))}
+                  onSkipToDashboard={() => setAppState((prev) => ({ ...prev, currentView: 'landing' }))}
+                />
               )
 
             case 'onboarding':
