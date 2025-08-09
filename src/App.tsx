@@ -1,5 +1,6 @@
 import type React from 'react'
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { CompanyDNAExtractor } from './components/mvp1/CompanyDNAExtractor'
 import { MarketingCalendarGenerator } from './components/mvp2/MarketingCalendarGenerator'
 // import MarketingPlanner from './components/planning/MarketingPlanner'
@@ -390,13 +391,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+      <div className="absolute inset-0 bg-grid-slate-100/50 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.4))] -z-10" />
+      
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-200">
                 <span className="text-white font-bold text-xl">S</span>
               </div>
               <span className="text-2xl font-bold text-gray-900">Slotted</span>
@@ -451,12 +454,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {mvpFeatures.map((mvp, index) => (
-              <div
+              <motion.div
                 key={mvp.id}
-                className={`group bg-white rounded-3xl shadow-lg hover:shadow-2xl p-6 lg:p-8 border-2 transition-all duration-300 ${
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }}
+                whileHover={{ 
+                  scale: mvp.status === 'available' ? 1.02 : 1,
+                  y: mvp.status === 'available' ? -8 : 0,
+                  transition: { type: "spring", stiffness: 400, damping: 17 }
+                }}
+                whileTap={{ scale: mvp.status === 'available' ? 0.98 : 1 }}
+                className={`group bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg hover:shadow-2xl p-6 lg:p-8 border-2 transition-all duration-300 ${
                   mvp.status === 'available'
-                    ? 'border-transparent hover:border-blue-200 cursor-pointer transform hover:-translate-y-2'
-                    : 'border-gray-100 opacity-75'
+                    ? 'border-transparent hover:border-blue-200/50 cursor-pointer'
+                    : 'border-gray-100/50 opacity-75'
                 }`}
                 onClick={() => {
                   if (mvp.status === 'available') {
@@ -511,11 +523,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ appState, setAppState }) => {
                 </ul>
 
                 {mvp.status === 'available' && (
-                  <button className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                  <motion.button 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
                     Try Now
-                  </button>
+                  </motion.button>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
